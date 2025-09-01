@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../models/categoria_registro_dto.dart';
 import '../services/categoria_service.dart';
 
 class RegistrarCategoriaPage extends StatefulWidget {
@@ -16,14 +15,20 @@ class _RegistrarCategoriaPageState extends State<RegistrarCategoriaPage> {
 
   void registrarCategoria() async {
     if (_formKey.currentState!.validate()) {
-      CategoriaRegistroDTO dto = CategoriaRegistroDTO(
-        nombre: nombre,
-        descripcion: descripcion,
-      );
-      await CategoriaService().registrarCategoria(dto);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Categoría registrada')),
-      );
+      Categoria categoria = Categoria(nombre: nombre, descripcion: descripcion);
+
+      final result = await CategoriaService().crearCategoria(categoria);
+
+      if (result != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Categoría registrada exitosamente')),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Error al registrar categoría')),
+        );
+      }
     }
   }
 
