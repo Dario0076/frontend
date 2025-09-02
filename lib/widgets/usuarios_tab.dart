@@ -58,11 +58,8 @@ class _UsuariosTabState extends State<UsuariosTab> {
       rol: _selectedRol,
     );
 
-    // Usar admin@admin.com como email del admin para crear usuarios
-    final createdUsuario = await UsuariosApiService.createUsuario(
-      usuario,
-      'admin@admin.com',
-    );
+    // Crear usuario usando autenticación JWT
+    final createdUsuario = await UsuariosApiService.createUsuario(usuario);
 
     if (createdUsuario != null) {
       _correoController.clear();

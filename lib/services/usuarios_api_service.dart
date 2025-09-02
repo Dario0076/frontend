@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Usuario {
   final int? id;
@@ -42,14 +43,31 @@ class Usuario {
 }
 
 class UsuariosApiService {
-  static const String baseUrl = 'http://localhost:8083/usuarios';
+  static const String baseUrl = 'http://localhost:8083/api/usuarios';
+
+  // Obtener token JWT almacenado
+  static Future<String?> getToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('jwt_token');
+  }
+
+  // Obtener headers con autorización
+  static Future<Map<String, String>> getAuthHeaders() async {
+    final token = await getToken();
+    final headers = {'Content-Type': 'application/json'};
+    if (token != null) {
+      headers['Authorization'] = 'Bearer $token';
+    }
+    return headers;
+  }
 
   static Future<List<Usuario>> getUsuarios() async {
     try {
-      final response = await http.get(
-        Uri.parse(baseUrl),
-        headers: {'Content-Type': 'application/json'},
-      );
+      final headers = await getAuthHeaders();
+      final response = await http.get(Uri.parse(baseUrl), headers: headers);
+
+      print('Respuesta getUsuarios: ${response.statusCode}');
+      print('Body: ${response.body}');
 
       if (response.statusCode == 200) {
         List<dynamic> jsonList = json.decode(response.body);
@@ -63,19 +81,17 @@ class UsuariosApiService {
     }
   }
 
-  static Future<Usuario?> createUsuario(
-    Usuario usuario,
-    String adminEmail,
-  ) async {
+  static Future<Usuario?> createUsuario(Usuario usuario) async {
     try {
+      final headers = await getAuthHeaders();
       final response = await http.post(
         Uri.parse(baseUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'X-User-Email': adminEmail,
-        },
+        headers: headers,
         body: json.encode(usuario.toJson()),
       );
+
+      print('Respuesta createUsuario: ${response.statusCode}');
+      print('Body: ${response.body}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Usuario.fromJson(json.decode(response.body));
@@ -90,9 +106,10 @@ class UsuariosApiService {
 
   static Future<bool> deleteUsuario(int id) async {
     try {
+      final headers = await getAuthHeaders();
       final response = await http.delete(
         Uri.parse('$baseUrl/$id'),
-        headers: {'Content-Type': 'application/json'},
+        headers: headers,
       );
 
       return response.statusCode == 200 || response.statusCode == 204;
