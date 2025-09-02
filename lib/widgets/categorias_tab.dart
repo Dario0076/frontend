@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/categoria_service.dart';
 
 class CategoriasTab extends StatefulWidget {
+  const CategoriasTab({super.key});
+
   @override
   _CategoriasTabState createState() => _CategoriasTabState();
 }
@@ -42,7 +44,7 @@ class _CategoriasTabState extends State<CategoriasTab> {
   Future<void> _createCategoria() async {
     if (_nombreController.text.isEmpty || _descripcionController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor completa todos los campos')),
+        const SnackBar(content: Text('Por favor completa todos los campos')),
       );
       return;
     }
@@ -58,13 +60,13 @@ class _CategoriasTabState extends State<CategoriasTab> {
       _nombreController.clear();
       _descripcionController.clear();
       _loadCategorias();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Categoría creada exitosamente')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Categoría creada exitosamente')),
+      );
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error al crear categoría')));
+      ).showSnackBar(const SnackBar(content: Text('Error al crear categoría')));
     }
   }
 
@@ -85,23 +87,23 @@ class _CategoriasTabState extends State<CategoriasTab> {
                     'Crear Nueva Categoría',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _nombreController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Nombre de la Categoría',
                             border: OutlineInputBorder(),
                           ),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: TextField(
                           controller: _descripcionController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Descripción',
                             border: OutlineInputBorder(),
                           ),
@@ -109,19 +111,19 @@ class _CategoriasTabState extends State<CategoriasTab> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton.icon(
                         onPressed: _createCategoria,
-                        icon: Icon(Icons.add),
-                        label: Text('Crear Categoría'),
+                        icon: const Icon(Icons.add),
+                        label: const Text('Crear Categoría'),
                       ),
                       ElevatedButton.icon(
                         onPressed: _loadCategorias,
-                        icon: Icon(Icons.refresh),
-                        label: Text('Refrescar'),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Refrescar'),
                       ),
                     ],
                   ),
@@ -129,7 +131,7 @@ class _CategoriasTabState extends State<CategoriasTab> {
               ),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           // Lista de categorías
           Expanded(
             child: Card(
@@ -142,15 +144,17 @@ class _CategoriasTabState extends State<CategoriasTab> {
                       'Categorías Disponibles',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                     Expanded(
                       child: isLoading
-                          ? Center(child: CircularProgressIndicator())
+                          ? const Center(child: CircularProgressIndicator())
                           : categorias.isEmpty
-                          ? Center(child: Text('No hay categorías disponibles'))
+                          ? const Center(
+                              child: Text('No hay categorías disponibles'),
+                            )
                           : ListView.separated(
                               itemCount: categorias.length,
-                              separatorBuilder: (_, __) => Divider(),
+                              separatorBuilder: (_, __) => const Divider(),
                               itemBuilder: (context, index) {
                                 final categoria = categorias[index];
                                 return ListTile(
@@ -166,13 +170,13 @@ class _CategoriasTabState extends State<CategoriasTab> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        icon: Icon(Icons.edit),
+                                        icon: const Icon(Icons.edit),
                                         onPressed: () {
                                           // TODO: Implementar edición
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
-                                            SnackBar(
+                                            const SnackBar(
                                               content: Text(
                                                 'Función de editar en desarrollo',
                                               ),
@@ -181,13 +185,13 @@ class _CategoriasTabState extends State<CategoriasTab> {
                                         },
                                       ),
                                       IconButton(
-                                        icon: Icon(Icons.delete),
+                                        icon: const Icon(Icons.delete),
                                         onPressed: () {
                                           // TODO: Implementar eliminación
                                           ScaffoldMessenger.of(
                                             context,
                                           ).showSnackBar(
-                                            SnackBar(
+                                            const SnackBar(
                                               content: Text(
                                                 'Función de eliminar en desarrollo',
                                               ),

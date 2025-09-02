@@ -85,10 +85,7 @@ class MovimientosApiService {
       final usuarioService = UsuarioService();
       final usuarioId = await usuarioService.getUsuarioId();
 
-      print('ID del usuario obtenido: $usuarioId'); // Debug
-
       if (usuarioId == null) {
-        print('Error: No se pudo obtener el ID del usuario logueado'); // Debug
         throw Exception('No se pudo obtener el ID del usuario logueado');
       }
 
@@ -102,8 +99,6 @@ class MovimientosApiService {
         },
         'usuarioId': usuarioId, // Usar el ID real del usuario
       };
-
-      print('DTO a enviar: $movimientoRegistroDTO'); // Debug
 
       final response = await http.post(
         Uri.parse(baseUrl), // Cambiar de '$baseUrl/simple' a solo 'baseUrl'

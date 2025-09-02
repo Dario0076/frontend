@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/usuarios_api_service.dart';
 
 class UsuariosTab extends StatefulWidget {
+  const UsuariosTab({super.key});
+
   @override
   _UsuariosTabState createState() => _UsuariosTabState();
 }
@@ -46,7 +48,7 @@ class _UsuariosTabState extends State<UsuariosTab> {
         _nombreController.text.isEmpty ||
         _contrasenaController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor completa todos los campos')),
+        const SnackBar(content: Text('Por favor completa todos los campos')),
       );
       return;
     }
@@ -67,13 +69,13 @@ class _UsuariosTabState extends State<UsuariosTab> {
       _contrasenaController.clear();
       _selectedRol = 'USER';
       _loadUsuarios();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Usuario creado exitosamente')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Usuario creado exitosamente')),
+      );
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error al crear usuario')));
+      ).showSnackBar(const SnackBar(content: Text('Error al crear usuario')));
     }
   }
 
@@ -82,13 +84,13 @@ class _UsuariosTabState extends State<UsuariosTab> {
 
     if (success) {
       _loadUsuarios();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Usuario eliminado exitosamente')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Usuario eliminado exitosamente')),
+      );
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al eliminar usuario')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al eliminar usuario')),
+      );
     }
   }
 
@@ -109,17 +111,17 @@ class _UsuariosTabState extends State<UsuariosTab> {
                       Expanded(
                         child: TextField(
                           controller: _correoController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Correo Electrónico',
                             border: OutlineInputBorder(),
                           ),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: TextField(
                           controller: _nombreController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Nombre de Usuario',
                             border: OutlineInputBorder(),
                           ),
@@ -127,24 +129,24 @@ class _UsuariosTabState extends State<UsuariosTab> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _contrasenaController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Contraseña',
                             border: OutlineInputBorder(),
                           ),
                           obscureText: true,
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           value: _selectedRol,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Rol',
                             border: OutlineInputBorder(),
                           ),
@@ -163,17 +165,17 @@ class _UsuariosTabState extends State<UsuariosTab> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
                         onPressed: _createUsuario,
-                        child: Text('Crear Usuario'),
+                        child: const Text('Crear Usuario'),
                       ),
                       ElevatedButton(
                         onPressed: _loadUsuarios,
-                        child: Text('Obtener Usuarios'),
+                        child: const Text('Obtener Usuarios'),
                       ),
                     ],
                   ),
@@ -181,19 +183,19 @@ class _UsuariosTabState extends State<UsuariosTab> {
               ),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           // Lista de usuarios
           Expanded(
             child: isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : usuarios.isEmpty
-                ? Center(child: Text('No hay usuarios disponibles'))
+                ? const Center(child: Text('No hay usuarios disponibles'))
                 : ListView.builder(
                     itemCount: usuarios.length,
                     itemBuilder: (context, index) {
                       final usuario = usuarios[index];
                       return Card(
-                        margin: EdgeInsets.symmetric(vertical: 4),
+                        margin: const EdgeInsets.symmetric(vertical: 4),
                         child: ListTile(
                           title: Text(usuario.nombreUsuario),
                           subtitle: Column(
@@ -207,7 +209,7 @@ class _UsuariosTabState extends State<UsuariosTab> {
                             ],
                           ),
                           trailing: IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
+                            icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () => usuario.id != null
                                 ? _deleteUsuario(usuario.id!)
                                 : null,

@@ -3,6 +3,8 @@ import '../services/productos_api_service.dart';
 import '../services/categoria_service.dart';
 
 class ProductosTab extends StatefulWidget {
+  const ProductosTab({super.key});
+
   @override
   _ProductosTabState createState() => _ProductosTabState();
 }
@@ -61,7 +63,7 @@ class _ProductosTabState extends State<ProductosTab> {
         _descripcionController.text.isEmpty ||
         _selectedCategoria == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Por favor completa todos los campos')),
+        const SnackBar(content: Text('Por favor completa todos los campos')),
       );
       return;
     }
@@ -91,13 +93,13 @@ class _ProductosTabState extends State<ProductosTab> {
         _selectedCategoria = null;
       });
       _loadProductos();
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Producto creado exitosamente')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Producto creado exitosamente')),
+      );
     } else {
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(SnackBar(content: Text('Error al crear producto')));
+      ).showSnackBar(const SnackBar(content: Text('Error al crear producto')));
     }
   }
 
@@ -107,12 +109,12 @@ class _ProductosTabState extends State<ProductosTab> {
     if (success) {
       _loadProductos();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Producto eliminado exitosamente')),
+        const SnackBar(content: Text('Producto eliminado exitosamente')),
       );
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al eliminar producto')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error al eliminar producto')),
+      );
     }
   }
 
@@ -133,7 +135,7 @@ class _ProductosTabState extends State<ProductosTab> {
                       Expanded(
                         child: TextField(
                           controller: _nombreController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Nombre del Producto',
                             border: OutlineInputBorder(),
                           ),
@@ -141,23 +143,23 @@ class _ProductosTabState extends State<ProductosTab> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _descripcionController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Descripción',
                             border: OutlineInputBorder(),
                           ),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: TextField(
                           controller: _precioController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Precio',
                             border: OutlineInputBorder(),
                           ),
@@ -166,24 +168,24 @@ class _ProductosTabState extends State<ProductosTab> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
                         child: TextField(
                           controller: _cantidadController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Cantidad',
                             border: OutlineInputBorder(),
                           ),
                           keyboardType: TextInputType.number,
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: DropdownButtonFormField<String>(
                           value: _selectedCategoria,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             labelText: 'Categoría',
                             border: OutlineInputBorder(),
                           ),
@@ -202,17 +204,17 @@ class _ProductosTabState extends State<ProductosTab> {
                       ),
                     ],
                   ),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       ElevatedButton(
                         onPressed: _createProducto,
-                        child: Text('Crear Producto'),
+                        child: const Text('Crear Producto'),
                       ),
                       ElevatedButton(
                         onPressed: _loadProductos,
-                        child: Text('Obtener Productos'),
+                        child: const Text('Obtener Productos'),
                       ),
                     ],
                   ),
@@ -220,19 +222,19 @@ class _ProductosTabState extends State<ProductosTab> {
               ),
             ),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           // Lista de productos
           Expanded(
             child: isLoading
-                ? Center(child: CircularProgressIndicator())
+                ? const Center(child: CircularProgressIndicator())
                 : productos.isEmpty
-                ? Center(child: Text('No hay productos disponibles'))
+                ? const Center(child: Text('No hay productos disponibles'))
                 : ListView.builder(
                     itemCount: productos.length,
                     itemBuilder: (context, index) {
                       final producto = productos[index];
                       return Card(
-                        margin: EdgeInsets.symmetric(vertical: 4),
+                        margin: const EdgeInsets.symmetric(vertical: 4),
                         child: ListTile(
                           title: Text(producto.nombre),
                           subtitle: Column(
@@ -248,7 +250,7 @@ class _ProductosTabState extends State<ProductosTab> {
                             ],
                           ),
                           trailing: IconButton(
-                            icon: Icon(Icons.delete, color: Colors.red),
+                            icon: const Icon(Icons.delete, color: Colors.red),
                             onPressed: () => producto.id != null
                                 ? _deleteProducto(producto.id!)
                                 : null,

@@ -119,10 +119,12 @@ class _LoginPageState extends State<LoginPage> {
                         keyboardType: TextInputType.emailAddress,
                         onChanged: (v) => correo = v,
                         validator: (v) {
-                          if (v == null || v.isEmpty)
+                          if (v == null || v.isEmpty) {
                             return 'Ingrese su correo';
-                          if (!v.contains('@'))
+                          }
+                          if (!v.contains('@')) {
                             return 'Ingrese un correo válido';
+                          }
                           return null;
                         },
                       ),
@@ -140,8 +142,9 @@ class _LoginPageState extends State<LoginPage> {
                         obscureText: true,
                         onChanged: (v) => contrasena = v,
                         validator: (v) {
-                          if (v == null || v.isEmpty)
+                          if (v == null || v.isEmpty) {
                             return 'Ingrese su contraseña';
+                          }
                           return null;
                         },
                       ),
@@ -183,8 +186,9 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: cargando
                               ? null
                               : () {
-                                  if (_formKey.currentState!.validate())
+                                  if (_formKey.currentState!.validate()) {
                                     iniciarSesion();
+                                  }
                                 },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(

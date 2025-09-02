@@ -37,55 +37,39 @@ class UsuarioService {
   Future<http.Response> registrarUsuario(UsuarioRegistroDTO dto) async {
     final headers = await getAuthHeaders();
     return http.post(
-      Uri.parse('$baseUrl/first'), // Usar endpoint para primer usuario
-      headers: {'Content-Type': 'application/json'},
+      Uri.parse('$baseUrl/first'),
+      headers: headers, // Usar los headers obtenidos
       body: jsonEncode(dto.toJson()),
     );
   }
 
   Future<bool> login(String correo, String contrasena) async {
     try {
-      print('Iniciando sesión con correo: $correo');
       final response = await http.post(
         Uri.parse('$baseUrl/login'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'correo': correo, 'contrasena': contrasena}),
       );
 
-      print('Respuesta del servidor: ${response.statusCode}');
-      print('Cuerpo de respuesta: ${response.body}');
-
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
-
-        print('Data completa recibida: $data'); // Debug
 
         // Guardar token JWT
         if (data['token'] != null) {
           await saveToken(data['token']);
-          print('Token guardado: ${data['token']}'); // Debug
         }
 
         // Guardar información del usuario
         if (data['usuario'] != null) {
-          print('Datos del usuario recibidos: ${data['usuario']}'); // Debug
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('usuario_data', jsonEncode(data['usuario']));
-          print('Usuario guardado en SharedPreferences'); // Debug
-
-          // Verificar que se guardó correctamente
-          final saved = prefs.getString('usuario_data');
-          print('Usuario guardado verificación: $saved'); // Debug
         }
 
-        print('Login exitoso - Token recibido');
         return true;
       } else {
-        print('Login fallido - Status: ${response.statusCode}');
         return false;
       }
     } catch (e) {
-      print('Error en login: $e');
       return false;
     }
   }
@@ -107,10 +91,7 @@ class UsuarioService {
 
   Future<int?> getUsuarioId() async {
     final usuario = await getUsuarioLogueado();
-    print('Usuario obtenido en getUsuarioId: $usuario'); // Debug
-    final id = usuario['id'];
-    print('ID extraído: $id'); // Debug
-    return id;
+    return usuario['id'];
   }
 
   Future<bool> isLoggedIn() async {

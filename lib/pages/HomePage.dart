@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
               ProductosTab(),
               UsuariosTab(),
               CategoriasTab(),
-              StockTab(),
+              const StockTab(),
             ],
           ),
         ),
