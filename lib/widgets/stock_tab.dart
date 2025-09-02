@@ -110,6 +110,127 @@ class _StockTabState extends State<StockTab> {
     );
   }
 
+  Future<void> _showEditDialog(Stock stock) async {
+    final TextEditingController umbralController = TextEditingController(
+      text: stock.umbralMinimo.toString(),
+    );
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            'Editar Umbral Mínimo - ${stock.nombreProducto ?? 'Producto ${stock.productoId}'}',
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.shade200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Información actual:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue.shade700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text('Cantidad actual: ${stock.cantidadActual}'),
+                      Text('Umbral actual: ${stock.umbralMinimo}'),
+                      if (stock.cantidadActual <= stock.umbralMinimo)
+                        const Text(
+                          '⚠️ STOCK BAJO',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: umbralController,
+                  decoration: const InputDecoration(
+                    labelText: 'Nuevo Umbral Mínimo',
+                    border: OutlineInputBorder(),
+                    helperText: 'Establece cuándo debe alertarse de stock bajo',
+                  ),
+                  keyboardType: TextInputType.number,
+                  autofocus: true,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final umbralValue = int.tryParse(umbralController.text);
+                if (umbralValue != null && umbralValue >= 0) {
+                  Navigator.of(context).pop();
+
+                  final updatedStock = Stock(
+                    id: stock.id,
+                    productoId: stock.productoId,
+                    cantidadActual: stock.cantidadActual,
+                    umbralMinimo: umbralValue,
+                    nombreProducto: stock.nombreProducto,
+                  );
+
+                  final result = await StockApiService.updateStock(
+                    stock.id,
+                    updatedStock,
+                  );
+                  if (result != null) {
+                    _loadStocks();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          'Umbral mínimo actualizado a $umbralValue exitosamente',
+                        ),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Error al actualizar el umbral mínimo'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text(
+                        'Por favor ingresa un número válido (mayor o igual a 0)',
+                      ),
+                      backgroundColor: Colors.orange,
+                    ),
+                  );
+                }
+              },
+              child: const Text('Actualizar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Future<void> _deleteStock(Stock stock) async {
     final confirmed = await showDialog<bool>(
       context: context,
@@ -218,16 +339,7 @@ class _StockTabState extends State<StockTab> {
                             IconButton(
                               icon: const Icon(Icons.edit),
                               tooltip: 'Editar',
-                              onPressed: () {
-                                // TODO: Implementar edición
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Funcionalidad de edición próximamente',
-                                    ),
-                                  ),
-                                );
-                              },
+                              onPressed: () => _showEditDialog(stock),
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete),

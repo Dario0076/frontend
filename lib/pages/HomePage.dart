@@ -57,13 +57,13 @@ class _HomePageState extends State<HomePage> {
               end: Alignment.bottomRight,
             ),
           ),
-          child: TabBarView(
+          child: const TabBarView(
             children: [
               MovimientosTab(),
               ProductosTab(),
               UsuariosTab(),
               CategoriasTab(),
-              const StockTab(),
+              StockTab(),
             ],
           ),
         ),
