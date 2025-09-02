@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../services/usuario_service.dart';
 
 class Movimiento {
   final int? id;
@@ -27,21 +28,22 @@ class Movimiento {
   factory Movimiento.fromJson(Map<String, dynamic> json) {
     return Movimiento(
       id: json['id'],
-      tipoMovimiento: json['tipoMovimiento'] ?? '',
+      tipoMovimiento: json['tipo'] ?? '', // Cambiar 'tipoMovimiento' por 'tipo'
       cantidad: json['cantidad'] ?? 0,
       fecha: DateTime.parse(json['fecha'] ?? DateTime.now().toIso8601String()),
       descripcion: json['descripcion'] ?? '',
       productoId: json['productoId'] ?? 0,
       nombreProducto: json['nombreProducto'],
-      usuarioNombre: json['usuarioNombre'],
-      usuarioEmail: json['usuarioEmail'],
+      usuarioNombre: json['usuario'], // Mapear 'usuario' del backend
+      usuarioEmail: json['usuarioEmail'], // Mapear 'usuarioEmail' del backend
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'tipoMovimiento': tipoMovimiento,
+      'tipo':
+          tipoMovimiento, // Cambiar 'tipoMovimiento' por 'tipo' para el backend
       'cantidad': cantidad,
       'fecha': fecha.toIso8601String(),
       'descripcion': descripcion,
@@ -79,10 +81,34 @@ class MovimientosApiService {
     Movimiento movimiento,
   ) async {
     try {
+      // Obtener el ID del usuario logueado
+      final usuarioService = UsuarioService();
+      final usuarioId = await usuarioService.getUsuarioId();
+
+      print('ID del usuario obtenido: $usuarioId'); // Debug
+
+      if (usuarioId == null) {
+        print('Error: No se pudo obtener el ID del usuario logueado'); // Debug
+        throw Exception('No se pudo obtener el ID del usuario logueado');
+      }
+
+      // Crear el DTO que espera el backend
+      final movimientoRegistroDTO = {
+        'movimiento': movimiento.toJson(),
+        'stock': {
+          'id': movimiento.productoId,
+          'productoId': movimiento.productoId,
+          'cantidad': movimiento.cantidad,
+        },
+        'usuarioId': usuarioId, // Usar el ID real del usuario
+      };
+
+      print('DTO a enviar: $movimientoRegistroDTO'); // Debug
+
       final response = await http.post(
-        Uri.parse('$baseUrl/simple'),
+        Uri.parse(baseUrl), // Cambiar de '$baseUrl/simple' a solo 'baseUrl'
         headers: {'Content-Type': 'application/json'},
-        body: json.encode(movimiento.toJson()),
+        body: json.encode(movimientoRegistroDTO),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {

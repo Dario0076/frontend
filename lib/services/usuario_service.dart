@@ -58,15 +58,24 @@ class UsuarioService {
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
 
+        print('Data completa recibida: $data'); // Debug
+
         // Guardar token JWT
         if (data['token'] != null) {
           await saveToken(data['token']);
+          print('Token guardado: ${data['token']}'); // Debug
         }
 
         // Guardar información del usuario
         if (data['usuario'] != null) {
+          print('Datos del usuario recibidos: ${data['usuario']}'); // Debug
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('usuario_data', jsonEncode(data['usuario']));
+          print('Usuario guardado en SharedPreferences'); // Debug
+
+          // Verificar que se guardó correctamente
+          final saved = prefs.getString('usuario_data');
+          print('Usuario guardado verificación: $saved'); // Debug
         }
 
         print('Login exitoso - Token recibido');
@@ -81,18 +90,27 @@ class UsuarioService {
     }
   }
 
-  Future<Map<String, String?>> getUsuarioLogueado() async {
+  Future<Map<String, dynamic>> getUsuarioLogueado() async {
     final prefs = await SharedPreferences.getInstance();
     final userData = prefs.getString('usuario_data');
     if (userData != null) {
       final data = jsonDecode(userData);
       return {
+        'id': data['id'],
         'nombre': data['nombre'],
         'correo': data['correo'],
         'rol': data['rol'],
       };
     }
-    return {'nombre': null, 'correo': null, 'rol': null};
+    return {'id': null, 'nombre': null, 'correo': null, 'rol': null};
+  }
+
+  Future<int?> getUsuarioId() async {
+    final usuario = await getUsuarioLogueado();
+    print('Usuario obtenido en getUsuarioId: $usuario'); // Debug
+    final id = usuario['id'];
+    print('ID extraído: $id'); // Debug
+    return id;
   }
 
   Future<bool> isLoggedIn() async {
