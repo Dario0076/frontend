@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config/api_config.dart';
 import 'categoria_service.dart';
 
 class Producto {
@@ -56,7 +57,7 @@ class Producto {
 }
 
 class ProductosApiService {
-  static const String baseUrl = 'http://localhost:8084/productos';
+  static String get baseUrl => ApiConfig.productosBaseUrl;
 
   static Future<List<Producto>> getProductos() async {
     try {

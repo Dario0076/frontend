@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../models/stock_model.dart';
+import '../config/api_config.dart';
 
 class StockApiService {
-  static const String baseUrl = 'http://localhost:8081/stock';
+  static String get baseUrl => ApiConfig.stockBaseUrl;
 
   static Future<List<Stock>> getStocks() async {
     try {

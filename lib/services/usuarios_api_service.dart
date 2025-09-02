@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import '../config/api_config.dart';
 
 class Usuario {
   final int? id;
@@ -43,7 +44,7 @@ class Usuario {
 }
 
 class UsuariosApiService {
-  static const String baseUrl = 'http://localhost:8083/api/usuarios';
+  static String get baseUrl => ApiConfig.usuariosBaseUrl;
 
   // Obtener token JWT almacenado
   static Future<String?> getToken() async {

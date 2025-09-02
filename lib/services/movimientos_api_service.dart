@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config/api_config.dart';
 import '../services/usuario_service.dart';
 
 class Movimiento {
@@ -56,7 +57,7 @@ class Movimiento {
 }
 
 class MovimientosApiService {
-  static const String baseUrl = 'http://localhost:8090/movimientos';
+  static String get baseUrl => ApiConfig.movimientosBaseUrl;
 
   static Future<List<Movimiento>> getMovimientos() async {
     try {
