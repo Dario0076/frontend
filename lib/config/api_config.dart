@@ -23,13 +23,9 @@ class ApiConfig {
       // Para web usa localhost
       return 'http://localhost';
     } else if (Platform.isAndroid) {
-      // Para emulador Android usa la IP especial para acceder al host
+      // Para emulador Android usa la IP para acceder al host
       return 'http://10.0.2.2';
-    } else if (Platform.isIOS) {
-      // Para simulador iOS usa localhost
-      return 'http://localhost';
     } else {
-      // Para otras plataformas usa localhost por defecto
       return 'http://localhost';
     }
   }
