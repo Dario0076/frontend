@@ -174,10 +174,17 @@ class _MovimientosTabState extends State<MovimientosTab> {
                             labelText: 'Producto',
                             border: OutlineInputBorder(),
                           ),
+                          isExpanded:
+                              true, // Agregar esta línea para expandir el dropdown
                           items: productos.map((Producto producto) {
                             return DropdownMenuItem<int>(
                               value: producto.id,
-                              child: Text(producto.nombre),
+                              child: Text(
+                                producto.nombre.length > 20
+                                    ? '${producto.nombre.substring(0, 20)}...'
+                                    : producto.nombre,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             );
                           }).toList(),
                           onChanged: (int? newValue) {
@@ -201,15 +208,19 @@ class _MovimientosTabState extends State<MovimientosTab> {
                   ),
                   const SizedBox(height: 16),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      ElevatedButton(
-                        onPressed: _createMovimiento,
-                        child: const Text('Crear Movimiento'),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _createMovimiento,
+                          child: const Text('Crear Movimiento'),
+                        ),
                       ),
-                      ElevatedButton(
-                        onPressed: _loadData,
-                        child: const Text('Obtener Movimientos'),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _loadData,
+                          child: const Text('Obtener Movimientos'),
+                        ),
                       ),
                     ],
                   ),

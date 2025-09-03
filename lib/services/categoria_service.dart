@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import '../config/api_config.dart';
 
 class Categoria {
   final int? id;
@@ -22,11 +23,21 @@ class Categoria {
 }
 
 class CategoriaService {
-  final String baseUrl = 'http://localhost:8084/categorias';
+  String get baseUrl => ApiConfig.categoriasBaseUrl;
 
   Future<List<Categoria>> listarCategorias() async {
     try {
-      final response = await http.get(Uri.parse(baseUrl));
+      print('=== DEBUG CATEGORIAS ===');
+      print('URL: $baseUrl');
+      print('========================');
+
+      final response = await http
+          .get(Uri.parse(baseUrl), headers: ApiConfig.defaultHeaders)
+          .timeout(ApiConfig.timeout);
+
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => Categoria.fromJson(json)).toList();

@@ -3,8 +3,17 @@ import 'package:flutter/foundation.dart';
 
 class ApiConfig {
   // URLs base para cada servicio
-  static String get usuariosBaseUrl => '${_getBaseUrl()}:8083/api/usuarios';
+  static String get usuariosBaseUrl {
+    final url = '${_getBaseUrl()}:8083/api/usuarios';
+    print('=== ApiConfig DEBUG ===');
+    print('Usuario Base URL: $url');
+    print('Platform: ${kIsWeb ? "WEB" : Platform.operatingSystem}');
+    print('======================');
+    return url;
+  }
+
   static String get productosBaseUrl => '${_getBaseUrl()}:8084/productos';
+  static String get categoriasBaseUrl => '${_getBaseUrl()}:8084/categorias';
   static String get stockBaseUrl => '${_getBaseUrl()}:8081/stock';
   static String get movimientosBaseUrl => '${_getBaseUrl()}:8090/movimientos';
 

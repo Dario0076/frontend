@@ -2,9 +2,10 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import '../models/usuario_registro_dto.dart';
+import '../config/api_config.dart';
 
 class UsuarioService {
-  final String baseUrl = 'http://localhost:8083/api/usuarios';
+  String get baseUrl => ApiConfig.usuariosBaseUrl;
 
   // Obtener token JWT almacenado
   Future<String?> getToken() async {
@@ -45,11 +46,26 @@ class UsuarioService {
 
   Future<bool> login(String correo, String contrasena) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'correo': correo, 'contrasena': contrasena}),
-      );
+      final loginUrl = '$baseUrl/login';
+      print('=== DEBUG LOGIN ===');
+      print('URL de login: $loginUrl');
+      print('Correo: $correo');
+      print('===================');
+
+      final response = await http
+          .post(
+            Uri.parse(loginUrl),
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+            },
+            body: jsonEncode({'correo': correo, 'contrasena': contrasena}),
+          )
+          .timeout(const Duration(seconds: 10));
+
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}');
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
@@ -57,19 +73,23 @@ class UsuarioService {
         // Guardar token JWT
         if (data['token'] != null) {
           await saveToken(data['token']);
+          print('Token guardado exitosamente');
         }
 
         // Guardar información del usuario
         if (data['usuario'] != null) {
           final prefs = await SharedPreferences.getInstance();
           await prefs.setString('usuario_data', jsonEncode(data['usuario']));
+          print('Datos de usuario guardados exitosamente');
         }
 
         return true;
       } else {
+        print('Login fallido - Status: ${response.statusCode}');
         return false;
       }
     } catch (e) {
+      print('Error en login: $e');
       return false;
     }
   }
