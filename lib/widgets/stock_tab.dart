@@ -11,12 +11,39 @@ class StockTab extends StatefulWidget {
 
 class _StockTabState extends State<StockTab> {
   List<Stock> stocks = [];
+  List<Stock> stocksFiltrados = [];
   bool isLoading = false;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadStocks();
+  }
+
+  void _filtrarStocks() {
+    setState(() {
+      stocksFiltrados = stocks.where((stock) {
+        final searchText = _searchController.text.toLowerCase();
+
+        if (searchText.isEmpty) {
+          return true;
+        }
+
+        // Buscar por ID del producto
+        if (stock.productoId.toString().contains(searchText)) {
+          return true;
+        }
+
+        // Buscar por nombre del producto
+        if (stock.nombreProducto != null &&
+            stock.nombreProducto!.toLowerCase().contains(searchText)) {
+          return true;
+        }
+
+        return false;
+      }).toList();
+    });
   }
 
   Future<void> _loadStocks() async {
@@ -29,8 +56,10 @@ class _StockTabState extends State<StockTab> {
       if (mounted) {
         setState(() {
           stocks = loadedStocks;
+          stocksFiltrados = loadedStocks;
           isLoading = false;
         });
+        _filtrarStocks();
       }
     } catch (e) {
       if (mounted) {
@@ -275,37 +304,91 @@ class _StockTabState extends State<StockTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              ElevatedButton.icon(
-                icon: const Icon(Icons.add),
-                label: const Text('Crear Stock'),
-                onPressed: _showCreateDialog,
+          // Filtro de búsqueda
+          Card(
+            elevation: 2,
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: const InputDecoration(
+                            labelText: 'Buscar stock',
+                            hintText: 'ID del producto o nombre...',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(),
+                            isDense: true,
+                          ),
+                          onChanged: (value) => _filtrarStocks(),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            _searchController.clear();
+                          });
+                          _filtrarStocks();
+                        },
+                        icon: const Icon(Icons.clear),
+                        tooltip: 'Limpiar búsqueda',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Mostrando ${stocksFiltrados.length} de ${stocks.length} stocks',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Crear Stock'),
+                            onPressed: _showCreateDialog,
+                          ),
+                          const SizedBox(width: 8),
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Actualizar'),
+                            onPressed: _loadStocks,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              const SizedBox(width: 12),
-              ElevatedButton.icon(
-                icon: const Icon(Icons.refresh),
-                label: const Text('Actualizar'),
-                onPressed: _loadStocks,
-              ),
-            ],
+            ),
           ),
           const SizedBox(height: 16),
           Expanded(
             child: isLoading
                 ? const Center(child: CircularProgressIndicator())
-                : stocks.isEmpty
-                ? const Center(
+                : stocksFiltrados.isEmpty
+                ? Center(
                     child: Text(
-                      'No hay stocks disponibles',
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      stocks.isEmpty
+                          ? 'No hay stocks disponibles'
+                          : 'No se encontraron stocks con la búsqueda aplicada',
+                      style: const TextStyle(fontSize: 16, color: Colors.grey),
                     ),
                   )
                 : ListView.separated(
-                    itemCount: stocks.length,
+                    itemCount: stocksFiltrados.length,
                     separatorBuilder: (_, __) => const Divider(),
                     itemBuilder: (context, index) {
-                      final stock = stocks[index];
+                      final stock = stocksFiltrados[index];
                       return ListTile(
                         leading: Icon(
                           Icons.inventory,
@@ -355,5 +438,11 @@ class _StockTabState extends State<StockTab> {
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }
