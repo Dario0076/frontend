@@ -17,30 +17,25 @@ git push -u origin main
 
 ### 2️⃣ **Configuración de Base de Datos**
 
-En Render, crear un **PostgreSQL Database** (MySQL no está disponible gratis):
+En Render, ya tienes creadas 4 bases de datos **PostgreSQL** separadas:
 
-1. Ve a Dashboard → New → PostgreSQL
-2. Nombre: `inventario-db`
-3. Plan: Free
-4. Guarda la `DATABASE_URL`
+1. Ve a Dashboard → Databases
+2. Para cada BD, copia su **Internal Database URL**
+3. Ejemplo StockService: `postgresql://stockdb_pdqv_user:5Wc7hdgsxZqFD1AvzvYSO82ToOf0joZj@dpg-d31377fdiees73afo4i0-a/stockdb_pdqv`
 
 ### 3️⃣ **Variables de Entorno para cada servicio**
 
 #### **UsuariosService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=postgresql://user:pass@host:port/database
-DB_USERNAME=user
-DB_PASSWORD=password
+DATABASE_URL=postgresql://usuariosdb_l24y_user:ZL8D6JKpZ6sM7J9vVVHrY0ivYUQ0di2D@dpg-d3136jumcj7s7380beng-a/usuariosdb_l24y
 PORT=8083
 ```
 
 #### **ProductosService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=postgresql://user:pass@host:port/database
-DB_USERNAME=user
-DB_PASSWORD=password
+DATABASE_URL=postgresql://productosdb_aiv9_user:yNL9gzHySMsNx4gp4MmVdafbwflS9TmF@dpg-d3135ivdiees73afmjag-a/productosdb_aiv9
 STOCK_SERVICE_URL=https://stock-service.onrender.com
 PORT=8084
 ```
@@ -48,9 +43,7 @@ PORT=8084
 #### **StockService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=postgresql://user:pass@host:port/database
-DB_USERNAME=user
-DB_PASSWORD=password
+DATABASE_URL=postgresql://stockdb_pdqv_user:5Wc7hdgsxZqFD1AvzvYSO82ToOf0joZj@dpg-d31377fdiees73afo4i0-a/stockdb_pdqv
 PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
 PORT=8081
 ```
@@ -58,9 +51,12 @@ PORT=8081
 #### **MovimientoService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=postgresql://user:pass@host:port/database
-DB_USERNAME=user
-DB_PASSWORD=password
+DATABASE_URL=postgresql://movimientodb_user:RMOLSFc9KrxqbdWF1NAp61DubkGIDmpH@dpg-d3133vumcj7s73808pt0-a/movimientodb
+USUARIOS_SERVICE_URL=https://usuarios-service.onrender.com
+PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
+STOCK_SERVICE_URL=https://stock-service.onrender.com
+PORT=8090
+```
 USUARIOS_SERVICE_URL=https://usuarios-service.onrender.com
 PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
 STOCK_SERVICE_URL=https://stock-service.onrender.com

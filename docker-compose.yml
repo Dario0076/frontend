@@ -1,22 +1,23 @@
 version: '3.8'
 
 services:
-  # Base de datos MySQL
-  mysql:
-    image: mysql:8.0
-    container_name: inventario-mysql
+  # Base de datos PostgreSQL
+  postgres:
+    image: postgres:15
+    container_name: inventario-postgres
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: usuariosdb
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - mysql_data:/var/lib/mysql
-      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db-postgres.sql:/docker-entrypoint-initdb.d/init-db.sql
     networks:
       - inventario-network
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
       timeout: 20s
       retries: 10
 
@@ -26,13 +27,11 @@ services:
     container_name: usuarios-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      DATABASE_URL: jdbc:mysql://mysql:3306/usuariosdb
-      DB_USERNAME: root
-      DB_PASSWORD: rootpassword
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/usuariosdb
     ports:
       - "8083:8083"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     networks:
       - inventario-network
@@ -43,13 +42,11 @@ services:
     container_name: productos-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      DATABASE_URL: jdbc:mysql://mysql:3306/productosdb
-      DB_USERNAME: root
-      DB_PASSWORD: rootpassword
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/productosdb
     ports:
       - "8084:8084"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     networks:
       - inventario-network
@@ -60,13 +57,11 @@ services:
     container_name: stock-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      DATABASE_URL: jdbc:mysql://mysql:3306/stockdb
-      DB_USERNAME: root
-      DB_PASSWORD: rootpassword
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/stockdb
     ports:
       - "8081:8081"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     networks:
       - inventario-network
@@ -77,19 +72,17 @@ services:
     container_name: movimiento-service
     environment:
       SPRING_PROFILES_ACTIVE: docker
-      DATABASE_URL: jdbc:mysql://mysql:3306/movimientosdb
-      DB_USERNAME: root
-      DB_PASSWORD: rootpassword
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/movimientosdb
     ports:
       - "8090:8090"
     depends_on:
-      mysql:
+      postgres:
         condition: service_healthy
     networks:
       - inventario-network
 
 volumes:
-  mysql_data:
+  postgres_data:
 
 networks:
   inventario-network:
