@@ -20,11 +20,10 @@ class ApiConfig {
 
   // URLs base para cada servicio
   static String get usuariosBaseUrl => '${_getUsuariosUrl()}/api/usuarios';
-  static String get productosBaseUrl => '${_getProductosUrl()}/api/productos';
-  static String get categoriasBaseUrl => '${_getProductosUrl()}/api/categorias';
-  static String get stockBaseUrl => '${_getStockUrl()}/api/stock';
-  static String get movimientosBaseUrl =>
-      '${_getMovimientosUrl()}/api/movimientos';
+  static String get productosBaseUrl => '${_getProductosUrl()}/productos';
+  static String get categoriasBaseUrl => '${_getProductosUrl()}/categorias';
+  static String get stockBaseUrl => '${_getStockUrl()}/stock';
+  static String get movimientosBaseUrl => '${_getMovimientosUrl()}/movimientos';
 
   // Obtener URLs según el modo (producción vs desarrollo)
   static String _getUsuariosUrl() {
