@@ -343,63 +343,27 @@ class _StockTabState extends State<StockTab> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'Mostrando ${stocksFiltrados.length} de ${stocks.length} stocks',
-                          style: const TextStyle(
-                            color: Colors.grey,
-                            fontSize: 12,
-                          ),
-                          overflow: TextOverflow.ellipsis,
+                      Text(
+                        'Mostrando ${stocksFiltrados.length} de ${stocks.length} stocks',
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
                         ),
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Flexible(
-                                  child: ElevatedButton.icon(
-                                    icon: const Icon(Icons.add, size: 14),
-                                    label: const Text(
-                                      'Crear',
-                                      style: TextStyle(fontSize: 11),
-                                    ),
-                                    onPressed: _showCreateDialog,
-                                    style: ElevatedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      minimumSize: const Size(60, 28),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Flexible(
-                                  child: OutlinedButton.icon(
-                                    icon: const Icon(Icons.refresh, size: 14),
-                                    label: const Text(
-                                      'Actualizar',
-                                      style: TextStyle(fontSize: 11),
-                                    ),
-                                    onPressed: _loadStocks,
-                                    style: OutlinedButton.styleFrom(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 6,
-                                        vertical: 2,
-                                      ),
-                                      minimumSize: const Size(60, 28),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            icon: const Icon(Icons.add),
+                            label: const Text('Crear Stock'),
+                            onPressed: _showCreateDialog,
+                          ),
+                          const SizedBox(width: 8),
+                          OutlinedButton.icon(
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Actualizar'),
+                            onPressed: _loadStocks,
+                          ),
+                        ],
                       ),
                     ],
                   ),

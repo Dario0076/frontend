@@ -2,56 +2,54 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 class ApiConfig {
-  // Flag para forzar uso de localhost (útil para testing local)
-  static bool _useLocalhost = false;
+  // Flag para forzar uso de localhost (útil para testing con Postman)
+  static bool _forceLocalhost = false;
 
-  // Método para activar modo local (solo para desarrollo)
-  static void enableLocalMode() {
-    _useLocalhost = true;
+  // Método para activar modo testing
+  static void enableTestingMode() {
+    _forceLocalhost = true;
   }
-
-  // URLs de producción en Render
-  static const String _prodUsuariosUrl = 'https://usuariosservice.onrender.com';
-  static const String _prodProductosUrl =
-      'https://productosservices.onrender.com';
-  static const String _prodStockUrl = 'https://stockservice-wki5.onrender.com';
-  static const String _prodMovimientosUrl =
-      'https://movimientoservice-rdi7.onrender.com';
 
   // URLs base para cada servicio
-  static String get usuariosBaseUrl => '${_getUsuariosUrl()}/api/usuarios';
-  static String get productosBaseUrl => '${_getProductosUrl()}/productos';
-  static String get categoriasBaseUrl => '${_getProductosUrl()}/categorias';
-  static String get stockBaseUrl => '${_getStockUrl()}/stock';
-  static String get movimientosBaseUrl => '${_getMovimientosUrl()}/movimientos';
-
-  // Obtener URLs según el modo (producción vs desarrollo)
-  static String _getUsuariosUrl() {
-    if (_useLocalhost) return 'http://localhost:8083';
-    return _prodUsuariosUrl;
+  static String get usuariosBaseUrl {
+    final url = '${_getBaseUrl()}:8083/api/usuarios';
+    print('=== ApiConfig DEBUG ===');
+    print('Usuario Base URL: $url');
+    print('Platform: ${kIsWeb ? "WEB" : Platform.operatingSystem}');
+    print('Testing Mode: $_forceLocalhost');
+    print('======================');
+    return url;
   }
 
-  static String _getProductosUrl() {
-    if (_useLocalhost) return 'http://localhost:8084';
-    return _prodProductosUrl;
+  static String get productosBaseUrl => '${_getBaseUrl()}:8084/productos';
+  static String get categoriasBaseUrl => '${_getBaseUrl()}:8084/categorias';
+  static String get stockBaseUrl => '${_getBaseUrl()}:8081/stock';
+  static String get movimientosBaseUrl => '${_getBaseUrl()}:8090/movimientos';
+
+  // Detecta automáticamente la URL base según la plataforma
+  static String _getBaseUrl() {
+    // Si está en modo testing, siempre usar localhost
+    if (_forceLocalhost) {
+      return 'http://localhost';
+    }
+
+    if (kIsWeb) {
+      // Para web usa localhost
+      return 'http://localhost';
+    } else if (Platform.isAndroid) {
+      // Para emulador Android usa la IP para acceder al host
+      return 'http://10.0.2.2';
+    } else {
+      return 'http://localhost';
+    }
   }
 
-  static String _getStockUrl() {
-    if (_useLocalhost) return 'http://localhost:8081';
-    return _prodStockUrl;
-  }
-
-  static String _getMovimientosUrl() {
-    if (_useLocalhost) return 'http://localhost:8090';
-    return _prodMovimientosUrl;
-  }
-
-  // Headers por defecto para las requests
+  // Headers comunes para todas las peticiones
   static Map<String, String> get defaultHeaders => {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
 
-  // Timeout para las requests
-  static const Duration timeout = Duration(seconds: 30);
+  // Timeout para todas las peticiones
+  static const Duration timeout = Duration(seconds: 10);
 }
