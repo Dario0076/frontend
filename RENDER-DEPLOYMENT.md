@@ -28,34 +28,30 @@ En Render, ya tienes creadas 4 bases de datos **PostgreSQL** separadas:
 #### **UsuariosService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=postgresql://usuariosdb_l24y_user:ZL8D6JKpZ6sM7J9vVVHrY0ivYUQ0di2D@dpg-d3136jumcj7s7380beng-a/usuariosdb_l24y
-PORT=8083
+DATABASE_URL=jdbc:postgresql://usuariosdb_l24y_user:ZL8D6JKpZ6sM7J9vVVHrY0ivYUQ0di2D@dpg-d3136jumcj7s7380beng-a:5432/usuariosdb_l24y
 ```
 
 #### **ProductosService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=postgresql://productosdb_aiv9_user:yNL9gzHySMsNx4gp4MmVdafbwflS9TmF@dpg-d3135ivdiees73afmjag-a/productosdb_aiv9
+DATABASE_URL=jdbc:postgresql://productosdb_aiv9_user:yNL9gzHySMsNx4gp4MmVdafbwflS9TmF@dpg-d3135ivdiees73afmjag-a:5432/productosdb_aiv9
 STOCK_SERVICE_URL=https://stock-service.onrender.com
-PORT=8084
 ```
 
 #### **StockService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=postgresql://stockdb_pdqv_user:5Wc7hdgsxZqFD1AvzvYSO82ToOf0joZj@dpg-d31377fdiees73afo4i0-a/stockdb_pdqv
+DATABASE_URL=jdbc:postgresql://stockdb_pdqv_user:5Wc7hdgsxZqFD1AvzvYSO82ToOf0joZj@dpg-d31377fdiees73afo4i0-a:5432/stockdb_pdqv
 PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
-PORT=8081
 ```
 
 #### **MovimientoService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=postgresql://movimientodb_user:RMOLSFc9KrxqbdWF1NAp61DubkGIDmpH@dpg-d3133vumcj7s73808pt0-a/movimientodb
+DATABASE_URL=jdbc:postgresql://movimientodb_user:RMOLSFc9KrxqbdWF1NAp61DubkGIDmpH@dpg-d3133vumcj7s73808pt0-a:5432/movimientodb
 USUARIOS_SERVICE_URL=https://usuarios-service.onrender.com
 PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
 STOCK_SERVICE_URL=https://stock-service.onrender.com
-PORT=8090
 ```
 USUARIOS_SERVICE_URL=https://usuarios-service.onrender.com
 PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
