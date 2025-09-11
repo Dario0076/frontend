@@ -28,27 +28,31 @@ En Render, ya tienes creadas 4 bases de datos **PostgreSQL** separadas:
 #### **UsuariosService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=jdbc:postgresql://usuariosdb_l24y_user:ZL8D6JKpZ6sM7J9vVVHrY0ivYUQ0di2D@dpg-d3136jumcj7s7380beng-a:5432/usuariosdb_l24y
+DB_USERNAME=usuariosdb_l24y_user
+DB_PASSWORD=ZL8D6JKpZ6sM7J9vVVHrY0ivYUQ0di2D
 ```
 
 #### **ProductosService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=jdbc:postgresql://productosdb_aiv9_user:yNL9gzHySMsNx4gp4MmVdafbwflS9TmF@dpg-d3135ivdiees73afmjag-a:5432/productosdb_aiv9
+DB_USERNAME=productosdb_aiv9_user
+DB_PASSWORD=yNL9gzHySMsNx4gp4MmVdafbwflS9TmF
 STOCK_SERVICE_URL=https://stock-service.onrender.com
 ```
 
 #### **StockService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=jdbc:postgresql://stockdb_pdqv_user:5Wc7hdgsxZqFD1AvzvYSO82ToOf0joZj@dpg-d31377fdiees73afo4i0-a:5432/stockdb_pdqv
+DB_USERNAME=stockdb_pdqv_user
+DB_PASSWORD=5Wc7hdgsxZqFD1AvzvYSO82ToOf0joZj
 PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
 ```
 
 #### **MovimientoService:**
 ```env
 SPRING_PROFILES_ACTIVE=production
-DATABASE_URL=jdbc:postgresql://movimientodb_user:RMOLSFc9KrxqbdWF1NAp61DubkGIDmpH@dpg-d3133vumcj7s73808pt0-a:5432/movimientodb
+DB_USERNAME=movimientodb_user
+DB_PASSWORD=RMOLSFc9KrxqbdWF1NAp61DubkGIDmpH
 USUARIOS_SERVICE_URL=https://usuarios-service.onrender.com
 PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
 STOCK_SERVICE_URL=https://stock-service.onrender.com
