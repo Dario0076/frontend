@@ -37,7 +37,7 @@ DB_PASSWORD=ZL8D6JKpZ6sM7J9vVVHrY0ivYUQ0di2D
 SPRING_PROFILES_ACTIVE=production
 DB_USERNAME=productosdb_aiv9_user
 DB_PASSWORD=yNL9gzHySMsNx4gp4MmVdafbwflS9TmF
-STOCK_SERVICE_URL=https://stock-service.onrender.com
+STOCK_SERVICE_URL=https://stockservice-wki5.onrender.com
 ```
 
 #### **StockService:**
@@ -45,7 +45,7 @@ STOCK_SERVICE_URL=https://stock-service.onrender.com
 SPRING_PROFILES_ACTIVE=production
 DB_USERNAME=stockdb_pdqv_user
 DB_PASSWORD=5Wc7hdgsxZqFD1AvzvYSO82ToOf0joZj
-PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
+PRODUCTOS_SERVICE_URL=https://productosservices.onrender.com
 ```
 
 #### **MovimientoService:**
@@ -53,9 +53,9 @@ PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
 SPRING_PROFILES_ACTIVE=production
 DB_USERNAME=movimientodb_user
 DB_PASSWORD=RMOLSFc9KrxqbdWF1NAp61DubkGIDmpH
-USUARIOS_SERVICE_URL=https://usuarios-service.onrender.com
-PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
-STOCK_SERVICE_URL=https://stock-service.onrender.com
+USUARIOS_SERVICE_URL=https://usuariosservice.onrender.com
+PRODUCTOS_SERVICE_URL=https://productosservices.onrender.com
+STOCK_SERVICE_URL=https://stockservice-wki5.onrender.com
 ```
 USUARIOS_SERVICE_URL=https://usuarios-service.onrender.com
 PRODUCTOS_SERVICE_URL=https://productos-service.onrender.com
@@ -70,14 +70,41 @@ Para cada microservicio:
 1. **New Web Service**
 2. **Connect GitHub repository**
 3. **Configuración:**
-   - **Build Command:** `./mvnw clean package -DskipTests`
-   - **Start Command:** `java -Dserver.port=$PORT -jar target/[SERVICE-NAME]-0.0.1-SNAPSHOT.jar`
+   - **Build Command:** Dejar vacío (Docker se encarga de todo)
+   - **Start Command:** Dejar vacío (configurado en Dockerfile)
    - **Instance Type:** Free
    - **Environment:** Production
+
+### ⚠️ **DOCKER CORREGIDO:**
+Se solucionó el error "/.mvn: not found" en todos los servicios:
+- Eliminada dependencia de Maven Wrapper
+- Ahora usa Maven preinstalado en el contenedor
 
 ### 5️⃣ **URLs de los servicios desplegados**
 
 Una vez desplegados, tendrás URLs como:
+```
+✅ UsuariosService: https://usuariosservice.onrender.com
+✅ ProductosService: https://productosservices.onrender.com  
+✅ StockService: https://stockservice-wki5.onrender.com
+✅ MovimientoService: https://movimientoservice-rdi7.onrender.com
+```
+
+### 📱 **Configuración del Frontend Flutter**
+
+El archivo `lib/config/api_config_new.dart` ya está configurado con las URLs de producción:
+
+```dart
+static const String _prodUsuariosUrl = 'https://usuariosservice.onrender.com';
+static const String _prodProductosUrl = 'https://productosservices.onrender.com';
+static const String _prodStockUrl = 'https://stockservice-wki5.onrender.com';
+static const String _prodMovimientosUrl = 'https://movimientoservice-rdi7.onrender.com';
+```
+
+Para usar en desarrollo local, puedes llamar:
+```dart
+ApiConfig.enableLocalMode(); // Cambia a localhost para desarrollo
+```
 - UsuariosService: `https://usuarios-service.onrender.com`
 - ProductosService: `https://productos-service.onrender.com`
 - StockService: `https://stock-service.onrender.com`
