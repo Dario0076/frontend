@@ -78,6 +78,31 @@ class ProductosApiService {
     }
   }
 
+  static Future<Producto?> getProductoById(int id) async {
+    try {
+      print('=== DEBUG GET PRODUCTO BY ID ===');
+      print('URL: $baseUrl/$id');
+      print('ID solicitado: $id');
+      print('================================');
+
+      final response = await http
+          .get(Uri.parse('$baseUrl/$id'), headers: ApiConfig.defaultHeaders)
+          .timeout(ApiConfig.timeout);
+
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        return Producto.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Error al obtener producto: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error en getProductoById: $e');
+      return null;
+    }
+  }
+
   static Future<Producto?> createProducto(Producto producto) async {
     try {
       final response = await http.post(

@@ -61,7 +61,9 @@ class UsuarioService {
             },
             body: jsonEncode({'correo': correo, 'contrasena': contrasena}),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(
+            ApiConfig.timeout,
+          ); // Usar timeout de ApiConfig (30 segundos)
 
       print('Status Code: ${response.statusCode}');
       print('Response Body: ${response.body}');

@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import '../models/producto_registro_dto.dart';
+import '../models/stock_model.dart';
 import '../services/producto_service.dart';
+import '../services/stock_api_service.dart';
 
 class RegistrarProductoPage extends StatefulWidget {
   const RegistrarProductoPage({super.key});
@@ -19,17 +22,84 @@ class _RegistrarProductoPageState extends State<RegistrarProductoPage> {
 
   void registrarProducto() async {
     if (_formKey.currentState!.validate()) {
-      ProductoRegistroDTO dto = ProductoRegistroDTO(
-        nombre: nombre,
-        descripcion: descripcion,
-        precio: precio,
-        stock: stock,
-        categoriaId: categoriaId,
-      );
-      await ProductoService().registrarProducto(dto);
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Producto registrado')));
+      try {
+        ProductoRegistroDTO dto = ProductoRegistroDTO(
+          nombre: nombre,
+          descripcion: descripcion,
+          precio: precio,
+          stock: stock,
+          categoriaId: categoriaId,
+        );
+
+        print('=== DEBUG CREAR PRODUCTO ===');
+        print('Datos del producto: ${dto.toJson()}');
+        print('=============================');
+
+        final response = await ProductoService().registrarProducto(dto);
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          // Producto creado exitosamente, ahora crear el stock
+          final responseData = json.decode(response.body);
+          final productoId = responseData['id'];
+
+          if (productoId != null && stock > 0) {
+            print('=== CREANDO STOCK AUTOMÁTICO ===');
+            print('ProductoId: $productoId, Stock: $stock');
+            print('================================');
+
+            final stockData = Stock(
+              id: 0,
+              productoId: productoId,
+              cantidadActual: stock,
+              umbralMinimo: (stock * 0.2)
+                  .round(), // 20% del stock como umbral mínimo
+            );
+
+            final createdStock = await StockApiService.createStock(stockData);
+
+            if (createdStock != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Producto y stock registrados exitosamente'),
+                ),
+              );
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                    'Producto registrado, pero error al crear stock',
+                  ),
+                ),
+              );
+            }
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Producto registrado exitosamente')),
+            );
+          }
+
+          // Limpiar formulario
+          _formKey.currentState!.reset();
+          nombre = '';
+          descripcion = '';
+          precio = 0.0;
+          stock = 0;
+          categoriaId = 0;
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Error al registrar producto: ${response.statusCode}',
+              ),
+            ),
+          );
+        }
+      } catch (e) {
+        print('Error en registrarProducto: $e');
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     }
   }
 

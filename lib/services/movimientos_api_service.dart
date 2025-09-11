@@ -82,9 +82,15 @@ class MovimientosApiService {
     Movimiento movimiento,
   ) async {
     try {
+      print('=== DEBUG CREAR MOVIMIENTO ===');
+      print('URL: $baseUrl');
+      print('Movimiento inicial: ${json.encode(movimiento.toJson())}');
+
       // Obtener el ID del usuario logueado
       final usuarioService = UsuarioService();
       final usuarioId = await usuarioService.getUsuarioId();
+
+      print('Usuario ID obtenido: $usuarioId');
 
       if (usuarioId == null) {
         throw Exception('No se pudo obtener el ID del usuario logueado');
@@ -101,11 +107,21 @@ class MovimientosApiService {
         'usuarioId': usuarioId, // Usar el ID real del usuario
       };
 
-      final response = await http.post(
-        Uri.parse(baseUrl), // Cambiar de '$baseUrl/simple' a solo 'baseUrl'
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode(movimientoRegistroDTO),
-      );
+      print('DTO completo a enviar: ${json.encode(movimientoRegistroDTO)}');
+      print('Headers: {Content-Type: application/json}');
+      print('===============================');
+
+      final response = await http
+          .post(
+            Uri.parse(baseUrl), // Cambiar de '$baseUrl/simple' a solo 'baseUrl'
+            headers: {'Content-Type': 'application/json'},
+            body: json.encode(movimientoRegistroDTO),
+          )
+          .timeout(ApiConfig.timeout);
+
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return json.decode(response.body);

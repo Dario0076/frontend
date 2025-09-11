@@ -24,12 +24,22 @@ class Stock {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
+    final json = <String, dynamic>{
       'productoId': productoId,
       'cantidadActual': cantidadActual,
       'umbralMinimo': umbralMinimo,
-      if (nombreProducto != null) 'nombreProducto': nombreProducto,
     };
+
+    // Solo incluir el ID si no es 0 (para actualizaciones)
+    if (id > 0) {
+      json['id'] = id;
+    }
+
+    // Solo incluir nombreProducto si no es null
+    if (nombreProducto != null) {
+      json['nombreProducto'] = nombreProducto;
+    }
+
+    return json;
   }
 }

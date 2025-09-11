@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/stock_model.dart';
 import '../services/stock_api_service.dart';
+import '../services/productos_api_service.dart';
 
 class StockTab extends StatefulWidget {
   const StockTab({Key? key}) : super(key: key);
@@ -53,6 +54,29 @@ class _StockTabState extends State<StockTab> {
 
     try {
       final loadedStocks = await StockApiService.getStocks();
+
+      // Obtener nombres de productos para cada stock
+      for (int i = 0; i < loadedStocks.length; i++) {
+        try {
+          final producto = await ProductosApiService.getProductoById(
+            loadedStocks[i].productoId,
+          );
+          if (producto != null) {
+            // Crear nuevo Stock con el nombre del producto
+            loadedStocks[i] = Stock(
+              id: loadedStocks[i].id,
+              productoId: loadedStocks[i].productoId,
+              cantidadActual: loadedStocks[i].cantidadActual,
+              umbralMinimo: loadedStocks[i].umbralMinimo,
+              nombreProducto: producto.nombre,
+            );
+          }
+        } catch (e) {
+          print('Error al obtener producto ${loadedStocks[i].productoId}: $e');
+          // Mantener el stock sin nombre si hay error
+        }
+      }
+
       if (mounted) {
         setState(() {
           stocks = loadedStocks;

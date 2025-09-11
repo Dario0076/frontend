@@ -9,14 +9,8 @@ class StockApiService {
   static Future<List<Stock>> getStocks() async {
     try {
       final response = await http
-          .get(
-            Uri.parse(baseUrl),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+          .get(Uri.parse(baseUrl), headers: ApiConfig.defaultHeaders)
+          .timeout(ApiConfig.timeout); // Cambiar de 10 a 30 segundos
 
       if (response.statusCode == 200) {
         List<dynamic> jsonList = json.decode(response.body);
@@ -32,16 +26,25 @@ class StockApiService {
 
   static Future<Stock?> createStock(Stock stock) async {
     try {
+      final requestBody = json.encode(stock.toJson());
+
+      print('=== DEBUG CREATE STOCK ===');
+      print('URL: $baseUrl');
+      print('Request Body: $requestBody');
+      print('Headers: ${ApiConfig.defaultHeaders}');
+      print('==========================');
+
       final response = await http
           .post(
             Uri.parse(baseUrl),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-            body: json.encode(stock.toJson()),
+            headers: ApiConfig.defaultHeaders,
+            body: requestBody,
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiConfig.timeout);
+
+      print('Response Status: ${response.statusCode}');
+      print('Response Body: ${response.body}');
+      print('Response Headers: ${response.headers}');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return Stock.fromJson(json.decode(response.body));
@@ -59,13 +62,10 @@ class StockApiService {
       final response = await http
           .put(
             Uri.parse('$baseUrl/$id'),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
+            headers: ApiConfig.defaultHeaders,
             body: json.encode(stock.toJson()),
           )
-          .timeout(const Duration(seconds: 10));
+          .timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
         return Stock.fromJson(json.decode(response.body));
@@ -81,14 +81,8 @@ class StockApiService {
   static Future<bool> deleteStock(int id) async {
     try {
       final response = await http
-          .delete(
-            Uri.parse('$baseUrl/$id'),
-            headers: {
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          )
-          .timeout(const Duration(seconds: 10));
+          .delete(Uri.parse('$baseUrl/$id'), headers: ApiConfig.defaultHeaders)
+          .timeout(ApiConfig.timeout);
 
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
