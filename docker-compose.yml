@@ -1,0 +1,96 @@
+version: '3.8'
+
+services:
+  # Base de datos MySQL
+  mysql:
+    image: mysql:8.0
+    container_name: inventario-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: usuariosdb
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - inventario-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  # UsuariosService
+  usuarios-service:
+    build: ./UsuariosService
+    container_name: usuarios-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DATABASE_URL: jdbc:mysql://mysql:3306/usuariosdb
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+    ports:
+      - "8083:8083"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventario-network
+
+  # ProductosService
+  productos-service:
+    build: ./ProductosService
+    container_name: productos-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DATABASE_URL: jdbc:mysql://mysql:3306/productosdb
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+    ports:
+      - "8084:8084"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventario-network
+
+  # StockService
+  stock-service:
+    build: ./StockService
+    container_name: stock-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DATABASE_URL: jdbc:mysql://mysql:3306/stockdb
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+    ports:
+      - "8081:8081"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventario-network
+
+  # MovimientoService
+  movimiento-service:
+    build: ./MovimientoService
+    container_name: movimiento-service
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      DATABASE_URL: jdbc:mysql://mysql:3306/movimientosdb
+      DB_USERNAME: root
+      DB_PASSWORD: rootpassword
+    ports:
+      - "8090:8090"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - inventario-network
+
+volumes:
+  mysql_data:
+
+networks:
+  inventario-network:
+    driver: bridge

@@ -163,12 +163,12 @@ class _ProductosTabState extends State<ProductosTab> {
                   Row(
                     children: [
                       Expanded(
-                        flex: 3,
+                        flex: 5,
                         child: TextField(
                           controller: _searchController,
                           decoration: const InputDecoration(
                             labelText: 'Buscar producto',
-                            hintText: 'Nombre o descripción...',
+                            hintText: 'Nombre...',
                             prefixIcon: Icon(Icons.search),
                             border: OutlineInputBorder(),
                             isDense: true,
@@ -176,25 +176,37 @@ class _ProductosTabState extends State<ProductosTab> {
                           onChanged: (value) => _filtrarProductos(),
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 6),
                       Expanded(
-                        flex: 2,
+                        flex: 3,
                         child: DropdownButtonFormField<int>(
                           value: _selectedCategoriaId,
                           decoration: const InputDecoration(
                             labelText: 'Categoría',
                             border: OutlineInputBorder(),
                             isDense: true,
+                            contentPadding: EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 8,
+                            ),
                           ),
+                          isExpanded: true,
                           items: [
                             const DropdownMenuItem<int>(
                               value: null,
-                              child: Text('Todas'),
+                              child: Text(
+                                'Todas',
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             ),
                             ...categorias.map((categoria) {
                               return DropdownMenuItem<int>(
                                 value: categoria.id,
-                                child: Text(categoria.nombre),
+                                child: Text(
+                                  categoria.nombre,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
                               );
                             }).toList(),
                           ],
@@ -206,17 +218,22 @@ class _ProductosTabState extends State<ProductosTab> {
                           },
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                            _selectedCategoriaId = null;
-                          });
-                          _filtrarProductos();
-                        },
-                        icon: const Icon(Icons.clear),
-                        tooltip: 'Limpiar filtros',
+                      const SizedBox(width: 4),
+                      SizedBox(
+                        width: 36,
+                        child: IconButton(
+                          onPressed: () {
+                            setState(() {
+                              _searchController.clear();
+                              _selectedCategoriaId = null;
+                            });
+                            _filtrarProductos();
+                          },
+                          icon: const Icon(Icons.clear, size: 18),
+                          tooltip: 'Limpiar',
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
                       ),
                     ],
                   ),
@@ -224,24 +241,38 @@ class _ProductosTabState extends State<ProductosTab> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        'Mostrando ${productosFiltrados.length} de ${productos.length} productos',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
+                      Flexible(
+                        flex: 2,
+                        child: Text(
+                          'Mostrando ${productosFiltrados.length} de ${productos.length} productos',
+                          style: const TextStyle(
+                            color: Colors.grey,
+                            fontSize: 12,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      TextButton.icon(
-                        onPressed: () {
-                          setState(() {
-                            _showCreateForm = !_showCreateForm;
-                          });
-                        },
-                        icon: Icon(
-                          _showCreateForm ? Icons.expand_less : Icons.add,
-                        ),
-                        label: Text(
-                          _showCreateForm ? 'Ocultar' : 'Crear Producto',
+                      Flexible(
+                        child: TextButton.icon(
+                          onPressed: () {
+                            setState(() {
+                              _showCreateForm = !_showCreateForm;
+                            });
+                          },
+                          icon: Icon(
+                            _showCreateForm ? Icons.expand_less : Icons.add,
+                            size: 16,
+                          ),
+                          label: Text(
+                            _showCreateForm ? 'Ocultar' : 'Crear',
+                            style: const TextStyle(fontSize: 12),
+                          ),
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -393,16 +424,22 @@ class _ProductosTabState extends State<ProductosTab> {
                               ),
                               Row(
                                 children: [
-                                  Text(
-                                    'Precio: \$${producto.precio.toStringAsFixed(2)}',
-                                    style: const TextStyle(fontSize: 12),
+                                  Flexible(
+                                    child: Text(
+                                      'Precio: \$${producto.precio.toStringAsFixed(2)}',
+                                      style: const TextStyle(fontSize: 12),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                  const SizedBox(width: 16),
-                                  Text(
-                                    'Categoría: ${producto.categoria?.nombre ?? 'Sin categoría'}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      'Categoría: ${producto.categoria?.nombre ?? 'Sin categoría'}',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
