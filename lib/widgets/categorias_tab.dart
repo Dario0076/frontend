@@ -21,23 +21,29 @@ class _CategoriasTabState extends State<CategoriasTab> {
   }
 
   Future<void> _loadCategorias() async {
+    if (!mounted) return;
+
     setState(() {
       isLoading = true;
     });
 
     try {
       final categoriasData = await CategoriaService().listarCategorias();
-      setState(() {
-        categorias = categoriasData;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          categorias = categoriasData;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al cargar categorías: $e')));
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al cargar categorías: $e')),
+        );
+      }
     }
   }
 

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 
 class ApiConfig {
   // Flag para forzar uso de localhost (útil para testing local)
-  static bool _useLocalhost = false;
+  static bool _useLocalhost = true; // CAMBIADO: Ahora usa localhost por defecto
 
   // Método para activar modo local (solo para desarrollo)
   static void enableLocalMode() {
@@ -62,5 +62,5 @@ class ApiConfig {
   };
 
   // Timeout para las requests
-  static const Duration timeout = Duration(seconds: 30);
+  static const Duration timeout = Duration(seconds: 10);
 }
