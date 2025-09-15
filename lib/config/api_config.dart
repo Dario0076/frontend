@@ -36,22 +36,42 @@ class ApiConfig {
 
   // Obtener URLs según el modo (producción vs desarrollo)
   static String _getUsuariosUrl() {
-    if (_useLocalhost) return 'http://localhost:8083';
+    if (_useLocalhost) {
+      if (!kIsWeb && Platform.isAndroid) {
+        return 'http://10.0.2.2:8083';
+      }
+      return 'http://localhost:8083';
+    }
     return _prodUsuariosUrl;
   }
 
   static String _getProductosUrl() {
-    if (_useLocalhost) return 'http://localhost:8084';
+    if (_useLocalhost) {
+      if (!kIsWeb && Platform.isAndroid) {
+        return 'http://10.0.2.2:8084';
+      }
+      return 'http://localhost:8084';
+    }
     return _prodProductosUrl;
   }
 
   static String _getStockUrl() {
-    if (_useLocalhost) return 'http://localhost:8081';
+    if (_useLocalhost) {
+      if (!kIsWeb && Platform.isAndroid) {
+        return 'http://10.0.2.2:8081';
+      }
+      return 'http://localhost:8081';
+    }
     return _prodStockUrl;
   }
 
   static String _getMovimientosUrl() {
-    if (_useLocalhost) return 'http://localhost:8090';
+    if (_useLocalhost) {
+      if (!kIsWeb && Platform.isAndroid) {
+        return 'http://10.0.2.2:8090';
+      }
+      return 'http://localhost:8090';
+    }
     return _prodMovimientosUrl;
   }
 
