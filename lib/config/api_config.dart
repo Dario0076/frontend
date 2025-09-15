@@ -2,10 +2,10 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 
 class ApiConfig {
-  // Flag para forzar uso de localhost (útil para testing local)
-  static bool _useLocalhost = true; // CAMBIADO: Ahora usa localhost por defecto
+  // Usa localhost por defecto para desarrollo
+  static bool _useLocalhost = true;
 
-  // Método para activar modo local (solo para desarrollo)
+  // Método para activar modo local
   static void enableLocalMode() {
     _useLocalhost = true;
   }
@@ -20,11 +20,6 @@ class ApiConfig {
   // URLs base para cada servicio
   static String get usuariosBaseUrl {
     final url = '${_getUsuariosUrl()}/api/usuarios';
-    print('=== ApiConfig DEBUG ===');
-    print('Usuario Base URL: $url');
-    print('Platform: ${kIsWeb ? "WEB" : Platform.operatingSystem}');
-    print('Use Localhost: $_useLocalhost');
-    print('======================');
     return url;
   }
 
