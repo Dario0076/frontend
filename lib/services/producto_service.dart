@@ -8,11 +8,6 @@ class ProductoService {
 
   Future<http.Response> registrarProducto(ProductoRegistroDTO dto) async {
     try {
-      print('=== DEBUG CREAR PRODUCTO ===');
-      print('URL: $baseUrl');
-      print('DTO: ${jsonEncode(dto.toJson())}');
-      print('=============================');
-
       return await http
           .post(
             Uri.parse(baseUrl),
@@ -21,7 +16,6 @@ class ProductoService {
           )
           .timeout(ApiConfig.timeout);
     } catch (e) {
-      print('Error en registrarProducto: $e');
       rethrow;
     }
   }

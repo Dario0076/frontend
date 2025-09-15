@@ -19,7 +19,6 @@ class StockApiService {
         throw Exception('Error al obtener stocks: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en getStocks: $e');
       return [];
     }
   }
@@ -28,8 +27,6 @@ class StockApiService {
     try {
       final requestBody = json.encode(stock.toJson());
 
-      print('=== DEBUG CREATE STOCK ===');
-      print('URL: $baseUrl');
       print('Request Body: $requestBody');
       print('Headers: ${ApiConfig.defaultHeaders}');
       print('==========================');

@@ -73,24 +73,15 @@ class ProductosApiService {
         throw Exception('Error al cargar productos: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en getProductos: $e');
       return [];
     }
   }
 
   static Future<Producto?> getProductoById(int id) async {
     try {
-      print('=== DEBUG GET PRODUCTO BY ID ===');
-      print('URL: $baseUrl/$id');
-      print('ID solicitado: $id');
-      print('================================');
-
       final response = await http
           .get(Uri.parse('$baseUrl/$id'), headers: ApiConfig.defaultHeaders)
           .timeout(ApiConfig.timeout);
-
-      print('Response Status: ${response.statusCode}');
-      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         return Producto.fromJson(json.decode(response.body));
@@ -98,7 +89,6 @@ class ProductosApiService {
         throw Exception('Error al obtener producto: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en getProductoById: $e');
       return null;
     }
   }
@@ -117,7 +107,6 @@ class ProductosApiService {
         throw Exception('Error al crear producto: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en createProducto: $e');
       return null;
     }
   }
@@ -131,7 +120,6 @@ class ProductosApiService {
 
       return response.statusCode == 200 || response.statusCode == 204;
     } catch (e) {
-      print('Error en deleteProducto: $e');
       return false;
     }
   }
@@ -150,7 +138,6 @@ class ProductosApiService {
         throw Exception('Error al actualizar producto: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en updateProducto: $e');
       return null;
     }
   }

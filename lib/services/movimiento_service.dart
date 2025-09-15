@@ -8,11 +8,6 @@ class MovimientoService {
 
   Future<http.Response> registrarMovimiento(MovimientoRegistroDTO dto) async {
     try {
-      print('=== DEBUG CREAR MOVIMIENTO ===');
-      print('URL: $baseUrl');
-      print('DTO: ${jsonEncode(dto.toJson())}');
-      print('===============================');
-
       return await http
           .post(
             Uri.parse(baseUrl),
@@ -21,7 +16,6 @@ class MovimientoService {
           )
           .timeout(ApiConfig.timeout);
     } catch (e) {
-      print('Error en registrarMovimiento: $e');
       rethrow;
     }
   }

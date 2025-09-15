@@ -27,16 +27,9 @@ class CategoriaService {
 
   Future<List<Categoria>> listarCategorias() async {
     try {
-      print('=== DEBUG CATEGORIAS ===');
-      print('URL: $baseUrl');
-      print('========================');
-
       final response = await http
           .get(Uri.parse(baseUrl), headers: ApiConfig.defaultHeaders)
           .timeout(ApiConfig.timeout);
-
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
@@ -45,7 +38,6 @@ class CategoriaService {
         throw Exception('Error al cargar categorías: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en listarCategorias: $e');
       return [];
     }
   }
@@ -64,7 +56,6 @@ class CategoriaService {
         throw Exception('Error al crear categoría: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error en crearCategoria: $e');
       return null;
     }
   }
