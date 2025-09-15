@@ -10,7 +10,6 @@ class ApiConfig {
     _useLocalhost = true;
   }
 
-  // URLs de producción en Render
   static const String _prodUsuariosUrl = 'https://usuariosservice.onrender.com';
   static const String _prodProductosUrl =
       'https://productosservices.onrender.com';
@@ -34,7 +33,7 @@ class ApiConfig {
   static String get stockBaseUrl => '${_getStockUrl()}/stock';
   static String get movimientosBaseUrl => '${_getMovimientosUrl()}/movimientos';
 
-  // Obtener URLs según el modo (producción vs desarrollo)
+  // Obtener URLs según el modo
   static String _getUsuariosUrl() {
     if (_useLocalhost) {
       if (!kIsWeb && Platform.isAndroid) {
