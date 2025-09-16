@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../services/usuario_service.dart';
 
+/// Página de inicio de sesión del sistema de inventario.
+/// Aquí el usuario ingresa su correo y contraseña para autenticarse.
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -8,6 +10,8 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
+/// Estado de la página de login.
+/// Maneja el formulario, la validación y la llamada al servicio de login.
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   String correo = '';
@@ -15,27 +19,24 @@ class _LoginPageState extends State<LoginPage> {
   bool cargando = false;
   String? error;
 
+  /// Lógica para iniciar sesión.
+  /// Llama a UsuarioService.login, guarda el JWT y navega a la pantalla principal si es exitoso.
   void iniciarSesion() async {
-    print('Iniciando sesión con correo: $correo');
     setState(() {
       cargando = true;
       error = null;
     });
     try {
       final exito = await UsuarioService().login(correo, contrasena);
-      print('Resultado del login: $exito');
       if (exito) {
-        print('Login exitoso, navegando a home');
-        // Navega a la pantalla principal
+        // Si el login es exitoso, navega a la pantalla principal
         Navigator.pushReplacementNamed(context, '/home');
       } else {
-        print('Login fallido');
         setState(() {
           error = 'Credenciales incorrectas';
         });
       }
     } catch (e) {
-      print('Error en iniciarSesion: $e');
       setState(() {
         error = 'Error al iniciar sesión';
       });

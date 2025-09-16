@@ -1,15 +1,19 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 
+/// Configuración centralizada de URLs y headers para los servicios de la API.
+/// Cambia automáticamente entre entorno local y producción.
 class ApiConfig {
-  // Usa localhost por defecto para desarrollo
+  // Usa localhost por defecto para desarrollo.
+  // Cambia a false para forzar URLs de producción.
   static bool _useLocalhost = true;
 
-  // Método para activar modo local
+  /// Activa el modo local
   static void enableLocalMode() {
     _useLocalhost = true;
   }
 
+  // URLs base de los servicios en Render
   static const String _prodUsuariosUrl = 'https://usuariosservice.onrender.com';
   static const String _prodProductosUrl =
       'https://productosservices.onrender.com';
@@ -17,21 +21,29 @@ class ApiConfig {
   static const String _prodMovimientosUrl =
       'https://movimientoservice-rdi7.onrender.com';
 
-  // URLs base para cada servicio
+  // Métodos para obtener la URL base de cada microservicio
+  // Ejemplo de uso: ApiConfig.usuariosBaseUrl
   static String get usuariosBaseUrl {
+    // Devuelve la URL base para el microservicio de usuarios
     final url = '${_getUsuariosUrl()}/api/usuarios';
     return url;
   }
 
-  static String get productosBaseUrl => '${_getProductosUrl()}/productos';
-  static String get categoriasBaseUrl => '${_getProductosUrl()}/categorias';
-  static String get stockBaseUrl => '${_getStockUrl()}/stock';
-  static String get movimientosBaseUrl => '${_getMovimientosUrl()}/movimientos';
+  static String get productosBaseUrl =>
+      '${_getProductosUrl()}/productos'; // URL base productos
+  static String get categoriasBaseUrl =>
+      '${_getProductosUrl()}/categorias'; // URL base categorías
+  static String get stockBaseUrl => '${_getStockUrl()}/stock'; // URL base stock
+  static String get movimientosBaseUrl =>
+      '${_getMovimientosUrl()}/movimientos'; // URL base movimientos
 
-  // Obtener URLs según el modo
+  // Métodos internos para decidir si usar localhost o producción
+  // Se usan en los getters de arriba
   static String _getUsuariosUrl() {
+    // Devuelve la URL base de usuarios según el entorno
     if (_useLocalhost) {
       if (!kIsWeb && Platform.isAndroid) {
+        // Android emulador usa 10.0.2.2 para localhost
         return 'http://10.0.2.2:8083';
       }
       return 'http://localhost:8083';
@@ -69,12 +81,12 @@ class ApiConfig {
     return _prodMovimientosUrl;
   }
 
-  // Headers por defecto para las requests
+  /// Headers por defecto para todas las peticiones HTTP
   static Map<String, String> get defaultHeaders => {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   };
 
-  // Timeout para las requests
+  /// Timeout por defecto para las peticiones HTTP
   static const Duration timeout = Duration(seconds: 10);
 }
