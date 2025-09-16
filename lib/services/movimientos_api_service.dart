@@ -3,6 +3,9 @@ import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import '../services/usuario_service.dart';
 
+/// Modelo de datos para un movimiento de inventario.
+/// Incluye métodos para serializar/deserializar desde/hacia JSON.
+
 class Movimiento {
   final int? id;
   final String tipoMovimiento;
@@ -26,6 +29,7 @@ class Movimiento {
     this.usuarioEmail,
   });
 
+  /// Crea una instancia de Movimiento a partir de un JSON.
   factory Movimiento.fromJson(Map<String, dynamic> json) {
     return Movimiento(
       id: json['id'],
@@ -40,6 +44,7 @@ class Movimiento {
     );
   }
 
+  /// Convierte la instancia de Movimiento a un mapa JSON.
   Map<String, dynamic> toJson() {
     return {
       'id': id,
@@ -56,9 +61,13 @@ class Movimiento {
   }
 }
 
+/// Servicio para interactuar con el microservicio de movimientos vía API REST.
+/// Permite obtener, crear y consultar movimientos de inventario.
 class MovimientosApiService {
+  /// Devuelve la URL base del microservicio de movimientos.
   static String get baseUrl => ApiConfig.movimientosBaseUrl;
 
+  /// Obtiene la lista de movimientos desde la API.
   static Future<List<Movimiento>> getMovimientos() async {
     try {
       final response = await http.get(
@@ -77,6 +86,8 @@ class MovimientosApiService {
     }
   }
 
+  /// Crea un nuevo movimiento en la API.
+  /// Incluye el ID del usuario logueado y la información de stock relacionada.
   static Future<Map<String, dynamic>?> createMovimiento(
     Movimiento movimiento,
   ) async {
@@ -120,6 +131,7 @@ class MovimientosApiService {
     }
   }
 
+  /// Obtiene los movimientos asociados a un producto específico.
   static Future<List<Movimiento>> getMovimientosByProducto(
     int productoId,
   ) async {

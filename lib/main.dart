@@ -1,3 +1,4 @@
+// Importaciones principales de Flutter y de las páginas del sistema
 import 'package:flutter/material.dart';
 import 'package:frontend/pages/RegistrarStockPage.dart';
 import 'pages/HomePage.dart';
@@ -7,17 +8,21 @@ import 'pages/RegistrarUsuarioPage.dart';
 import 'pages/RegistrarCategoriaPage.dart';
 import 'pages/LoginPage.dart';
 
+/// Punto de entrada principal de la aplicación
 void main() {
   runApp(const MyApp());
 }
 
+/// Widget principal de la aplicación que configura el tema y las rutas
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      // Título de la aplicación
       title: 'Sistema de Inventario',
+      // Definición del tema visual principal
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: ColorScheme.fromSeed(
@@ -54,7 +59,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
+      // Ruta inicial de la app (pantalla de login)
       initialRoute: '/login',
+      // Definición de rutas para navegación entre pantallas
       routes: {
         '/login': (context) => const LoginPage(),
         '/': (context) => const HomePage(),

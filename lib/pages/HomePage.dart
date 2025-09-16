@@ -1,3 +1,4 @@
+// Importaciones de Flutter y de los widgets de cada módulo del sistema
 import 'package:flutter/material.dart';
 import '../widgets/stock_tab.dart';
 import '../widgets/productos_tab.dart';
@@ -5,6 +6,8 @@ import '../widgets/usuarios_tab.dart';
 import '../widgets/movimientos_tab.dart';
 import '../widgets/categorias_tab.dart';
 
+/// Pantalla principal del sistema de inventario.
+/// Muestra las pestañas para navegar entre los módulos principales.
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -15,12 +18,14 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
+    // Recupera el nombre del usuario si fue enviado por argumentos
     final String? nombreUsuario =
         ModalRoute.of(context)?.settings.arguments as String?;
     return DefaultTabController(
-      length: 5,
+      length: 5, // Número de pestañas principales
       child: Scaffold(
         appBar: AppBar(
+          // Título dinámico según el usuario logueado
           title: Text(
             nombreUsuario != null
                 ? 'Bienvenido, $nombreUsuario'
@@ -28,6 +33,7 @@ class _HomePageState extends State<HomePage> {
           ),
           centerTitle: true,
           actions: [
+            // Botón para cerrar sesión y volver al login
             IconButton(
               icon: const Icon(Icons.logout),
               tooltip: 'Cerrar sesión',
@@ -36,6 +42,7 @@ class _HomePageState extends State<HomePage> {
               },
             ),
           ],
+          // Barra de pestañas para navegar entre módulos
           bottom: const TabBar(
             isScrollable: false,
             labelColor: Colors.white,
@@ -50,6 +57,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         body: Container(
+          // Fondo con gradiente para mejor estética
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: [Color(0xFFF8F9FA), Color(0xFFE8F0FE)],
@@ -57,6 +65,7 @@ class _HomePageState extends State<HomePage> {
               end: Alignment.bottomRight,
             ),
           ),
+          // Cada pestaña muestra el widget correspondiente al módulo
           child: const TabBarView(
             children: [
               MovimientosTab(),

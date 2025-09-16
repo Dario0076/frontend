@@ -3,14 +3,19 @@ import 'package:http/http.dart' as http;
 import '../models/stock_model.dart';
 import '../config/api_config.dart';
 
+/// Servicio para interactuar con el microservicio de stock vía API REST.
+/// Permite obtener, crear, actualizar y eliminar registros de stock.
+
 class StockApiService {
+  /// Devuelve la URL base del microservicio de stock.
   static String get baseUrl => ApiConfig.stockBaseUrl;
 
+  /// Obtiene la lista de stocks desde la API.
   static Future<List<Stock>> getStocks() async {
     try {
       final response = await http
           .get(Uri.parse(baseUrl), headers: ApiConfig.defaultHeaders)
-          .timeout(ApiConfig.timeout); // Cambiar de 10 a 30 segundos
+          .timeout(ApiConfig.timeout); // Espera máxima para la respuesta
 
       if (response.statusCode == 200) {
         List<dynamic> jsonList = json.decode(response.body);
@@ -23,10 +28,12 @@ class StockApiService {
     }
   }
 
+  /// Crea un nuevo registro de stock en la API.
   static Future<Stock?> createStock(Stock stock) async {
     try {
       final requestBody = json.encode(stock.toJson());
 
+      // Debug: imprimir cuerpo y cabeceras de la petición
       print('Request Body: $requestBody');
       print('Headers: ${ApiConfig.defaultHeaders}');
       print('==========================');
@@ -39,6 +46,7 @@ class StockApiService {
           )
           .timeout(ApiConfig.timeout);
 
+      // Debug: imprimir respuesta
       print('Response Status: ${response.statusCode}');
       print('Response Body: ${response.body}');
       print('Response Headers: ${response.headers}');
@@ -54,6 +62,7 @@ class StockApiService {
     }
   }
 
+  /// Actualiza un registro de stock existente en la API.
   static Future<Stock?> updateStock(int id, Stock stock) async {
     try {
       final response = await http
@@ -75,6 +84,7 @@ class StockApiService {
     }
   }
 
+  /// Elimina un registro de stock por su ID en la API.
   static Future<bool> deleteStock(int id) async {
     try {
       final response = await http
