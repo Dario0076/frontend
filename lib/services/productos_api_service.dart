@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import '../config/api_config.dart';
 import 'categoria_service.dart';
 
+/// Modelo de datos para un producto.
+/// Incluye métodos para serializar/deserializar desde/hacia JSON.
 class Producto {
   final int? id;
   final String nombre;
@@ -56,9 +58,13 @@ class Producto {
   }
 }
 
+/// Servicio para interactuar con el microservicio de productos vía API REST.
+/// Permite obtener, crear, actualizar y eliminar productos.
 class ProductosApiService {
+  /// Devuelve la URL base del microservicio de productos.
   static String get baseUrl => ApiConfig.productosBaseUrl;
 
+  /// Obtiene la lista de productos desde la API.
   static Future<List<Producto>> getProductos() async {
     try {
       final response = await http.get(
@@ -77,6 +83,7 @@ class ProductosApiService {
     }
   }
 
+  /// Obtiene un producto por su ID desde la API.
   static Future<Producto?> getProductoById(int id) async {
     try {
       final response = await http
@@ -93,6 +100,7 @@ class ProductosApiService {
     }
   }
 
+  /// Crea un nuevo producto en la API.
   static Future<Producto?> createProducto(Producto producto) async {
     try {
       final response = await http.post(
@@ -111,6 +119,7 @@ class ProductosApiService {
     }
   }
 
+  /// Elimina un producto por su ID en la API.
   static Future<bool> deleteProducto(int id) async {
     try {
       final response = await http.delete(
@@ -124,6 +133,7 @@ class ProductosApiService {
     }
   }
 
+  /// Actualiza un producto existente en la API.
   static Future<Producto?> updateProducto(Producto producto) async {
     try {
       final response = await http.put(
