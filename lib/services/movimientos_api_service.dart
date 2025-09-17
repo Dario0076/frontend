@@ -153,4 +153,55 @@ class MovimientosApiService {
       return [];
     }
   }
+
+  /// Obtiene los movimientos en un rango de fechas (formato: yyyy-MM-ddTHH:mm:ss)
+  static Future<List<Movimiento>> getMovimientosByFecha(
+    DateTime inicio,
+    DateTime fin,
+  ) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$baseUrl/fecha?inicio=${inicio.toIso8601String()}&fin=${fin.toIso8601String()}',
+        ),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => Movimiento.fromJson(json)).toList();
+      } else {
+        throw Exception(
+          'Error al cargar movimientos por fecha: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      return [];
+    }
+  }
+
+  /// Obtiene los movimientos de un producto en un rango de fechas
+  static Future<List<Movimiento>> getMovimientosByProductoAndFecha(
+    int productoId,
+    DateTime inicio,
+    DateTime fin,
+  ) async {
+    try {
+      final response = await http.get(
+        Uri.parse(
+          '$baseUrl/producto/$productoId/fecha?inicio=${inicio.toIso8601String()}&fin=${fin.toIso8601String()}',
+        ),
+        headers: {'Content-Type': 'application/json'},
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> jsonList = json.decode(response.body);
+        return jsonList.map((json) => Movimiento.fromJson(json)).toList();
+      } else {
+        throw Exception(
+          'Error al cargar movimientos por producto y fecha: ${response.statusCode}',
+        );
+      }
+    } catch (e) {
+      return [];
+    }
+  }
 }

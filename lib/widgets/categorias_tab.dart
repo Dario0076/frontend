@@ -177,32 +177,162 @@ class _CategoriasTabState extends State<CategoriasTab> {
                                     children: [
                                       IconButton(
                                         icon: const Icon(Icons.edit),
-                                        onPressed: () {
-                                          // TODO: Implementar edición
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Función de editar en desarrollo',
+                                        onPressed: () async {
+                                          // Diálogo para editar categoría
+                                          final nombreController =
+                                              TextEditingController(
+                                                text: categoria.nombre,
+                                              );
+                                          final descripcionController =
+                                              TextEditingController(
+                                                text: categoria.descripcion,
+                                              );
+                                          final confirm = await showDialog<bool>(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text(
+                                                'Editar Categoría',
                                               ),
+                                              content: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  TextField(
+                                                    controller:
+                                                        nombreController,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                          labelText: 'Nombre',
+                                                        ),
+                                                  ),
+                                                  const SizedBox(height: 8),
+                                                  TextField(
+                                                    controller:
+                                                        descripcionController,
+                                                    decoration:
+                                                        const InputDecoration(
+                                                          labelText:
+                                                              'Descripción',
+                                                        ),
+                                                  ),
+                                                ],
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                        context,
+                                                        false,
+                                                      ),
+                                                  child: const Text('Cancelar'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                        context,
+                                                        true,
+                                                      ),
+                                                  child: const Text('Guardar'),
+                                                ),
+                                              ],
                                             ),
                                           );
+                                          if (confirm == true) {
+                                            final editada = Categoria(
+                                              id: categoria.id,
+                                              nombre: nombreController.text,
+                                              descripcion:
+                                                  descripcionController.text,
+                                            );
+                                            final resultado =
+                                                await CategoriaService()
+                                                    .editarCategoria(editada);
+                                            if (resultado != null) {
+                                              _loadCategorias();
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Categoría editada exitosamente',
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Error al editar categoría',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
                                         },
                                       ),
                                       IconButton(
                                         icon: const Icon(Icons.delete),
-                                        onPressed: () {
-                                          // TODO: Implementar eliminación
-                                          ScaffoldMessenger.of(
-                                            context,
-                                          ).showSnackBar(
-                                            const SnackBar(
-                                              content: Text(
-                                                'Función de eliminar en desarrollo',
+                                        onPressed: () async {
+                                          // Confirmar eliminación
+                                          final confirm = await showDialog<bool>(
+                                            context: context,
+                                            builder: (context) => AlertDialog(
+                                              title: const Text(
+                                                'Eliminar Categoría',
                                               ),
+                                              content: Text(
+                                                '¿Estás seguro de eliminar la categoría "${categoria.nombre}"?',
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                        context,
+                                                        false,
+                                                      ),
+                                                  child: const Text('Cancelar'),
+                                                ),
+                                                TextButton(
+                                                  onPressed: () =>
+                                                      Navigator.pop(
+                                                        context,
+                                                        true,
+                                                      ),
+                                                  child: const Text('Eliminar'),
+                                                ),
+                                              ],
                                             ),
                                           );
+                                          if (confirm == true) {
+                                            final exito =
+                                                await CategoriaService()
+                                                    .eliminarCategoria(
+                                                      categoria.id!,
+                                                    );
+                                            if (exito) {
+                                              _loadCategorias();
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Categoría eliminada exitosamente',
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                const SnackBar(
+                                                  content: Text(
+                                                    'Error al eliminar categoría',
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
                                         },
                                       ),
                                     ],

@@ -59,4 +59,33 @@ class CategoriaService {
       return null;
     }
   }
+
+  Future<bool> eliminarCategoria(int id) async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$baseUrl/$id'),
+        headers: ApiConfig.defaultHeaders,
+      );
+      return response.statusCode == 200 || response.statusCode == 204;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<Categoria?> editarCategoria(Categoria categoria) async {
+    try {
+      final response = await http.put(
+        Uri.parse('$baseUrl/${categoria.id}'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(categoria.toJson()),
+      );
+      if (response.statusCode == 200) {
+        return Categoria.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Error al editar categoría: ${response.statusCode}');
+      }
+    } catch (e) {
+      return null;
+    }
+  }
 }

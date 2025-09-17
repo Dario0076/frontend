@@ -19,6 +19,10 @@ class _MovimientosTabState extends State<MovimientosTab> {
   String _selectedTipoMovimiento = 'ENTRADA';
   int? _selectedProductoId;
   final UsuarioService _usuarioService = UsuarioService();
+  // Filtros
+  int? _filtroProductoId;
+  DateTime? _filtroFechaInicio;
+  DateTime? _filtroFechaFin;
 
   @override
   void initState() {
@@ -30,10 +34,31 @@ class _MovimientosTabState extends State<MovimientosTab> {
     setState(() {
       isLoading = true;
     });
-
     try {
-      final movimientosData = await MovimientosApiService.getMovimientos();
       final productosData = await ProductosApiService.getProductos();
+      List<Movimiento> movimientosData = [];
+      // Lógica de filtros
+      if (_filtroProductoId != null &&
+          _filtroFechaInicio != null &&
+          _filtroFechaFin != null) {
+        movimientosData =
+            await MovimientosApiService.getMovimientosByProductoAndFecha(
+              _filtroProductoId!,
+              _filtroFechaInicio!,
+              _filtroFechaFin!,
+            );
+      } else if (_filtroProductoId != null) {
+        movimientosData = await MovimientosApiService.getMovimientosByProducto(
+          _filtroProductoId!,
+        );
+      } else if (_filtroFechaInicio != null && _filtroFechaFin != null) {
+        movimientosData = await MovimientosApiService.getMovimientosByFecha(
+          _filtroFechaInicio!,
+          _filtroFechaFin!,
+        );
+      } else {
+        movimientosData = await MovimientosApiService.getMovimientos();
+      }
       setState(() {
         movimientos = movimientosData;
         productos = productosData;
@@ -46,6 +71,35 @@ class _MovimientosTabState extends State<MovimientosTab> {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text('Error al cargar datos: $e')));
+    }
+  }
+
+  // Métodos para seleccionar fechas
+  Future<void> _selectFechaInicio(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _filtroFechaInicio ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        _filtroFechaInicio = picked;
+      });
+    }
+  }
+
+  Future<void> _selectFechaFin(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _filtroFechaFin ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() {
+        _filtroFechaFin = picked;
+      });
     }
   }
 
@@ -123,6 +177,104 @@ class _MovimientosTabState extends State<MovimientosTab> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
+          // Filtros de búsqueda
+          Card(
+            color: Colors.blue[50],
+            child: Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Row(
+                children: [
+                  // Filtro producto
+                  Expanded(
+                    child: DropdownButtonFormField<int>(
+                      value: _filtroProductoId,
+                      decoration: const InputDecoration(
+                        labelText: 'Filtrar por producto',
+                        border: OutlineInputBorder(),
+                      ),
+                      isExpanded: true,
+                      items: [
+                        const DropdownMenuItem<int>(
+                          value: null,
+                          child: Text('Todos'),
+                        ),
+                        ...productos.map((Producto producto) {
+                          return DropdownMenuItem<int>(
+                            value: producto.id,
+                            child: Text(producto.nombre),
+                          );
+                        }).toList(),
+                      ],
+                      onChanged: (int? newValue) {
+                        setState(() {
+                          _filtroProductoId = newValue;
+                        });
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Filtro fecha inicio
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => _selectFechaInicio(context),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Fecha inicio',
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Text(
+                          _filtroFechaInicio != null
+                              ? _filtroFechaInicio!.toLocal().toString().split(
+                                  ' ',
+                                )[0]
+                              : 'Todas',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  // Filtro fecha fin
+                  Expanded(
+                    child: InkWell(
+                      onTap: () => _selectFechaFin(context),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Fecha fin',
+                          border: OutlineInputBorder(),
+                        ),
+                        child: Text(
+                          _filtroFechaFin != null
+                              ? _filtroFechaFin!.toLocal().toString().split(
+                                  ' ',
+                                )[0]
+                              : 'Todas',
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  ElevatedButton(
+                    onPressed: _loadData,
+                    child: const Text('Filtrar'),
+                  ),
+                  const SizedBox(width: 8),
+                  IconButton(
+                    icon: const Icon(Icons.clear),
+                    tooltip: 'Limpiar filtros',
+                    onPressed: () {
+                      setState(() {
+                        _filtroProductoId = null;
+                        _filtroFechaInicio = null;
+                        _filtroFechaFin = null;
+                      });
+                      _loadData();
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
           // Formulario de creación
           Card(
             child: Padding(
