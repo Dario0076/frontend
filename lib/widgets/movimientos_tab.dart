@@ -177,208 +177,226 @@ class _MovimientosTabState extends State<MovimientosTab> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Filtros de búsqueda
-          Card(
-            color: Colors.blue[50],
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Row(
-                children: [
-                  // Filtro producto
-                  Expanded(
-                    child: DropdownButtonFormField<int>(
-                      value: _filtroProductoId,
-                      decoration: const InputDecoration(
-                        labelText: 'Filtrar por producto',
-                        border: OutlineInputBorder(),
-                      ),
-                      isExpanded: true,
-                      items: [
-                        const DropdownMenuItem<int>(
-                          value: null,
-                          child: Text('Todos'),
-                        ),
-                        ...productos.map((Producto producto) {
-                          return DropdownMenuItem<int>(
-                            value: producto.id,
-                            child: Text(producto.nombre),
-                          );
-                        }).toList(),
-                      ],
-                      onChanged: (int? newValue) {
-                        setState(() {
-                          _filtroProductoId = newValue;
-                        });
-                      },
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Filtro fecha inicio
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _selectFechaInicio(context),
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Fecha inicio',
-                          border: OutlineInputBorder(),
-                        ),
-                        child: Text(
-                          _filtroFechaInicio != null
-                              ? _filtroFechaInicio!.toLocal().toString().split(
-                                  ' ',
-                                )[0]
-                              : 'Todas',
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  // Filtro fecha fin
-                  Expanded(
-                    child: InkWell(
-                      onTap: () => _selectFechaFin(context),
-                      child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Fecha fin',
-                          border: OutlineInputBorder(),
-                        ),
-                        child: Text(
-                          _filtroFechaFin != null
-                              ? _filtroFechaFin!.toLocal().toString().split(
-                                  ' ',
-                                )[0]
-                              : 'Todas',
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: _loadData,
-                    child: const Text('Filtrar'),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    icon: const Icon(Icons.clear),
-                    tooltip: 'Limpiar filtros',
-                    onPressed: () {
-                      setState(() {
-                        _filtroProductoId = null;
-                        _filtroFechaInicio = null;
-                        _filtroFechaFin = null;
-                      });
-                      _loadData();
-                    },
-                  ),
-                ],
-              ),
+          // Filtros de búsqueda (ExpansionTile)
+          ExpansionTile(
+            title: const Text(
+              'Filtros de búsqueda',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
-          ),
-          const SizedBox(height: 8),
-          // Formulario de creación
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedTipoMovimiento,
-                          decoration: const InputDecoration(
-                            labelText: 'Tipo de Movimiento',
-                            border: OutlineInputBorder(),
-                          ),
-                          items: ['ENTRADA', 'SALIDA'].map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedTipoMovimiento = newValue!;
-                            });
-                          },
+            initiallyExpanded: false,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 4,
+                ),
+                child: Row(
+                  children: [
+                    // Filtro producto
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        value: _filtroProductoId,
+                        decoration: const InputDecoration(
+                          labelText: 'Filtrar por producto',
+                          border: OutlineInputBorder(),
                         ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _cantidadController,
-                          decoration: const InputDecoration(
-                            labelText: 'Cantidad',
-                            border: OutlineInputBorder(),
+                        isExpanded: true,
+                        items: [
+                          const DropdownMenuItem<int>(
+                            value: null,
+                            child: Text('Todos'),
                           ),
-                          keyboardType: TextInputType.number,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: DropdownButtonFormField<int>(
-                          value: _selectedProductoId,
-                          decoration: const InputDecoration(
-                            labelText: 'Producto',
-                            border: OutlineInputBorder(),
-                          ),
-                          isExpanded:
-                              true, // Agregar esta línea para expandir el dropdown
-                          items: productos.map((Producto producto) {
+                          ...productos.map((Producto producto) {
                             return DropdownMenuItem<int>(
                               value: producto.id,
-                              child: Text(
-                                producto.nombre.length > 20
-                                    ? '${producto.nombre.substring(0, 20)}...'
-                                    : producto.nombre,
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                              child: Text(producto.nombre),
                             );
                           }).toList(),
-                          onChanged: (int? newValue) {
-                            setState(() {
-                              _selectedProductoId = newValue;
-                            });
-                          },
-                        ),
+                        ],
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            _filtroProductoId = newValue;
+                          });
+                        },
                       ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _descripcionController,
+                    ),
+                    const SizedBox(width: 8),
+                    // Filtro fecha inicio
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => _selectFechaInicio(context),
+                        child: InputDecorator(
                           decoration: const InputDecoration(
-                            labelText: 'Descripción',
+                            labelText: 'Fecha inicio',
                             border: OutlineInputBorder(),
+                          ),
+                          child: Text(
+                            _filtroFechaInicio != null
+                                ? _filtroFechaInicio!
+                                      .toLocal()
+                                      .toString()
+                                      .split(' ')[0]
+                                : 'Todas',
                           ),
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _createMovimiento,
-                          child: const Text('Crear Movimiento'),
+                    ),
+                    const SizedBox(width: 8),
+                    // Filtro fecha fin
+                    Expanded(
+                      child: InkWell(
+                        onTap: () => _selectFechaFin(context),
+                        child: InputDecorator(
+                          decoration: const InputDecoration(
+                            labelText: 'Fecha fin',
+                            border: OutlineInputBorder(),
+                          ),
+                          child: Text(
+                            _filtroFechaFin != null
+                                ? _filtroFechaFin!.toLocal().toString().split(
+                                    ' ',
+                                  )[0]
+                                : 'Todas',
+                          ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: _loadData,
-                          child: const Text('Obtener Movimientos'),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                    ),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      onPressed: _loadData,
+                      child: const Text('Filtrar'),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.clear),
+                      tooltip: 'Limpiar filtros',
+                      onPressed: () {
+                        setState(() {
+                          _filtroProductoId = null;
+                          _filtroFechaInicio = null;
+                          _filtroFechaFin = null;
+                        });
+                        _loadData();
+                      },
+                    ),
+                  ],
+                ),
               ),
+            ],
+          ),
+          // Formulario de creación (ExpansionTile)
+          ExpansionTile(
+            title: const Text(
+              'Crear Movimiento',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
+            initiallyExpanded: false,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 4,
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<String>(
+                            value: _selectedTipoMovimiento,
+                            decoration: const InputDecoration(
+                              labelText: 'Tipo de Movimiento',
+                              border: OutlineInputBorder(),
+                            ),
+                            items: ['ENTRADA', 'SALIDA'].map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              setState(() {
+                                _selectedTipoMovimiento = newValue!;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextField(
+                            controller: _cantidadController,
+                            decoration: const InputDecoration(
+                              labelText: 'Cantidad',
+                              border: OutlineInputBorder(),
+                            ),
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<int>(
+                            value: _selectedProductoId,
+                            decoration: const InputDecoration(
+                              labelText: 'Producto',
+                              border: OutlineInputBorder(),
+                            ),
+                            isExpanded: true,
+                            items: productos.map((Producto producto) {
+                              return DropdownMenuItem<int>(
+                                value: producto.id,
+                                child: Text(
+                                  producto.nombre.length > 20
+                                      ? '${producto.nombre.substring(0, 20)}...'
+                                      : producto.nombre,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              );
+                            }).toList(),
+                            onChanged: (int? newValue) {
+                              setState(() {
+                                _selectedProductoId = newValue;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextField(
+                            controller: _descripcionController,
+                            decoration: const InputDecoration(
+                              labelText: 'Descripción',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _createMovimiento,
+                            child: const Text('Crear Movimiento'),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: _loadData,
+                            child: const Text('Obtener Movimientos'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           // Lista de movimientos
@@ -392,27 +410,53 @@ class _MovimientosTabState extends State<MovimientosTab> {
                     itemBuilder: (context, index) {
                       final movimiento = movimientos[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        child: ListTile(
-                          title: Text(
-                            '${movimiento.tipoMovimiento} - ${movimiento.cantidad} unidades',
+                        margin: const EdgeInsets.symmetric(
+                          vertical: 2,
+                          horizontal: 0,
+                        ),
+                        elevation: 1,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 6,
+                            horizontal: 12,
                           ),
-                          subtitle: Column(
+                          child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Producto: ${_getProductoNombre(movimiento.productoId)}',
+                                '${movimiento.tipoMovimiento} - ${movimiento.cantidad} unidades',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 15,
+                                ),
                               ),
-                              Text('Descripción: ${movimiento.descripcion}'),
+                              Text(
+                                'Producto: ${_getProductoNombre(movimiento.productoId)}',
+                                style: const TextStyle(fontSize: 13),
+                              ),
+                              Text(
+                                'Descripción: ${movimiento.descripcion}',
+                                style: const TextStyle(fontSize: 13),
+                              ),
                               Text(
                                 'Usuario: ${movimiento.usuarioNombre ?? 'No disponible'} (${movimiento.usuarioEmail ?? ''})',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
                               ),
                               Text(
                                 'Fecha: ${movimiento.fecha.toString().split('.')[0]}',
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
                               ),
                             ],
                           ),
-                          // Eliminado el botón de borrar - los movimientos son inmutables
                         ),
                       );
                     },

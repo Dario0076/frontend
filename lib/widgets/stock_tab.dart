@@ -15,6 +15,10 @@ class _StockTabState extends State<StockTab> {
   List<Stock> stocksFiltrados = [];
   bool isLoading = false;
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _productoIdController = TextEditingController();
+  final TextEditingController _cantidadController = TextEditingController();
+  final TextEditingController _umbralController = TextEditingController();
+  bool _expansionFormOpen = false;
 
   @override
   void initState() {
@@ -328,72 +332,32 @@ class _StockTabState extends State<StockTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Filtro de búsqueda
-          Card(
-            elevation: 2,
-            child: Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: const InputDecoration(
-                            labelText: 'Buscar stock',
-                            hintText: 'ID del producto o nombre...',
-                            prefixIcon: Icon(Icons.search),
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                          onChanged: (value) => _filtrarStocks(),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                          });
-                          _filtrarStocks();
-                        },
-                        icon: const Icon(Icons.clear),
-                        tooltip: 'Limpiar búsqueda',
-                      ),
-                    ],
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _searchController,
+                  decoration: const InputDecoration(
+                    labelText: 'Buscar stock',
+                    hintText: 'ID del producto o nombre...',
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Mostrando ${stocksFiltrados.length} de ${stocks.length} stocks',
-                        style: const TextStyle(
-                          color: Colors.grey,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            icon: const Icon(Icons.add),
-                            label: const Text('Crear Stock'),
-                            onPressed: _showCreateDialog,
-                          ),
-                          const SizedBox(width: 8),
-                          OutlinedButton.icon(
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Actualizar'),
-                            onPressed: _loadStocks,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
+                  onChanged: (value) => _filtrarStocks(),
+                ),
               ),
-            ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.add),
+                label: const Text('Crear Stock'),
+                onPressed: _showCreateDialog,
+              ),
+              const SizedBox(width: 8),
+              OutlinedButton.icon(
+                icon: const Icon(Icons.refresh),
+                label: const Text('Actualizar'),
+                onPressed: _loadStocks,
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -414,16 +378,9 @@ class _StockTabState extends State<StockTab> {
                     itemBuilder: (context, index) {
                       final stock = stocksFiltrados[index];
                       return ListTile(
-                        leading: Icon(
-                          Icons.inventory,
-                          color: stock.cantidadActual <= stock.umbralMinimo
-                              ? Colors.red
-                              : Theme.of(context).colorScheme.primary,
-                        ),
                         title: Text(
-                          stock.nombreProducto != null
-                              ? '${stock.nombreProducto} (ID: ${stock.productoId})'
-                              : 'Producto ID: ${stock.productoId}',
+                          stock.nombreProducto ??
+                              'Producto ${stock.productoId}',
                         ),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -436,6 +393,7 @@ class _StockTabState extends State<StockTab> {
                                 style: TextStyle(
                                   color: Colors.red,
                                   fontWeight: FontWeight.bold,
+                                  fontSize: 12,
                                 ),
                               ),
                           ],

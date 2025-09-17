@@ -82,60 +82,65 @@ class _CategoriasTabState extends State<CategoriasTab> {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          // Formulario para crear categoría
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Crear Nueva Categoría',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _nombreController,
-                          decoration: const InputDecoration(
-                            labelText: 'Nombre de la Categoría',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _descripcionController,
-                          decoration: const InputDecoration(
-                            labelText: 'Descripción',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton.icon(
-                        onPressed: _createCategoria,
-                        icon: const Icon(Icons.add),
-                        label: const Text('Crear Categoría'),
-                      ),
-                      ElevatedButton.icon(
-                        onPressed: _loadCategorias,
-                        icon: const Icon(Icons.refresh),
-                        label: const Text('Refrescar'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+          // Formulario para crear categoría (ExpansionTile)
+          ExpansionTile(
+            title: const Text(
+              'Crear Nueva Categoría',
+              style: TextStyle(fontWeight: FontWeight.bold),
             ),
+            initiallyExpanded: false,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 4,
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: _nombreController,
+                            decoration: const InputDecoration(
+                              labelText: 'Nombre de la Categoría',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: TextField(
+                            controller: _descripcionController,
+                            decoration: const InputDecoration(
+                              labelText: 'Descripción',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: _createCategoria,
+                          icon: const Icon(Icons.add),
+                          label: const Text('Crear Categoría'),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: _loadCategorias,
+                          icon: const Icon(Icons.refresh),
+                          label: const Text('Refrescar'),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           // Lista de categorías
@@ -163,179 +168,218 @@ class _CategoriasTabState extends State<CategoriasTab> {
                               separatorBuilder: (_, __) => const Divider(),
                               itemBuilder: (context, index) {
                                 final categoria = categorias[index];
-                                return ListTile(
-                                  leading: Icon(
-                                    Icons.category,
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 2,
+                                    horizontal: 0,
                                   ),
-                                  title: Text(categoria.nombre),
-                                  subtitle: Text(categoria.descripcion),
-                                  trailing: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.edit),
-                                        onPressed: () async {
-                                          // Diálogo para editar categoría
-                                          final nombreController =
-                                              TextEditingController(
-                                                text: categoria.nombre,
-                                              );
-                                          final descripcionController =
-                                              TextEditingController(
-                                                text: categoria.descripcion,
-                                              );
-                                          final confirm = await showDialog<bool>(
-                                            context: context,
-                                            builder: (context) => AlertDialog(
-                                              title: const Text(
-                                                'Editar Categoría',
-                                              ),
-                                              content: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  TextField(
-                                                    controller:
-                                                        nombreController,
-                                                    decoration:
-                                                        const InputDecoration(
-                                                          labelText: 'Nombre',
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(8),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.03),
+                                        blurRadius: 2,
+                                        offset: const Offset(0, 1),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                      horizontal: 12,
+                                    ),
+                                    leading: Icon(
+                                      Icons.category,
+                                      color: Theme.of(
+                                        context,
+                                      ).colorScheme.primary,
+                                    ),
+                                    title: Text(
+                                      categoria.nombre,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      categoria.descripcion,
+                                      style: const TextStyle(fontSize: 13),
+                                    ),
+                                    trailing: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IconButton(
+                                          icon: const Icon(Icons.edit),
+                                          onPressed: () async {
+                                            // Diálogo para editar categoría
+                                            final nombreController =
+                                                TextEditingController(
+                                                  text: categoria.nombre,
+                                                );
+                                            final descripcionController =
+                                                TextEditingController(
+                                                  text: categoria.descripcion,
+                                                );
+                                            final confirm = await showDialog<bool>(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                title: const Text(
+                                                  'Editar Categoría',
+                                                ),
+                                                content: Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    TextField(
+                                                      controller:
+                                                          nombreController,
+                                                      decoration:
+                                                          const InputDecoration(
+                                                            labelText: 'Nombre',
+                                                          ),
+                                                    ),
+                                                    const SizedBox(height: 8),
+                                                    TextField(
+                                                      controller:
+                                                          descripcionController,
+                                                      decoration:
+                                                          const InputDecoration(
+                                                            labelText:
+                                                                'Descripción',
+                                                          ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                          context,
+                                                          false,
                                                         ),
+                                                    child: const Text(
+                                                      'Cancelar',
+                                                    ),
                                                   ),
-                                                  const SizedBox(height: 8),
-                                                  TextField(
-                                                    controller:
-                                                        descripcionController,
-                                                    decoration:
-                                                        const InputDecoration(
-                                                          labelText:
-                                                              'Descripción',
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                          context,
+                                                          true,
                                                         ),
+                                                    child: const Text(
+                                                      'Guardar',
+                                                    ),
                                                   ),
                                                 ],
                                               ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                        context,
-                                                        false,
-                                                      ),
-                                                  child: const Text('Cancelar'),
-                                                ),
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                        context,
-                                                        true,
-                                                      ),
-                                                  child: const Text('Guardar'),
-                                                ),
-                                              ],
-                                            ),
-                                          );
-                                          if (confirm == true) {
-                                            final editada = Categoria(
-                                              id: categoria.id,
-                                              nombre: nombreController.text,
-                                              descripcion:
-                                                  descripcionController.text,
                                             );
-                                            final resultado =
-                                                await CategoriaService()
-                                                    .editarCategoria(editada);
-                                            if (resultado != null) {
-                                              _loadCategorias();
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Categoría editada exitosamente',
-                                                  ),
-                                                ),
+                                            if (confirm == true) {
+                                              final editada = Categoria(
+                                                id: categoria.id,
+                                                nombre: nombreController.text,
+                                                descripcion:
+                                                    descripcionController.text,
                                               );
-                                            } else {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Error al editar categoría',
+                                              final resultado =
+                                                  await CategoriaService()
+                                                      .editarCategoria(editada);
+                                              if (resultado != null) {
+                                                _loadCategorias();
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Categoría editada exitosamente',
+                                                    ),
                                                   ),
-                                                ),
-                                              );
+                                                );
+                                              } else {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Error al editar categoría',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
                                             }
-                                          }
-                                        },
-                                      ),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete),
-                                        onPressed: () async {
-                                          // Confirmar eliminación
-                                          final confirm = await showDialog<bool>(
-                                            context: context,
-                                            builder: (context) => AlertDialog(
-                                              title: const Text(
-                                                'Eliminar Categoría',
-                                              ),
-                                              content: Text(
-                                                '¿Estás seguro de eliminar la categoría "${categoria.nombre}"?',
-                                              ),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                        context,
-                                                        false,
-                                                      ),
-                                                  child: const Text('Cancelar'),
+                                          },
+                                        ),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete),
+                                          onPressed: () async {
+                                            // Confirmar eliminación
+                                            final confirm = await showDialog<bool>(
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                title: const Text(
+                                                  'Eliminar Categoría',
                                                 ),
-                                                TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(
-                                                        context,
-                                                        true,
-                                                      ),
-                                                  child: const Text('Eliminar'),
+                                                content: Text(
+                                                  '¿Estás seguro de eliminar la categoría "${categoria.nombre}"?',
                                                 ),
-                                              ],
-                                            ),
-                                          );
-                                          if (confirm == true) {
-                                            final exito =
-                                                await CategoriaService()
-                                                    .eliminarCategoria(
-                                                      categoria.id!,
-                                                    );
-                                            if (exito) {
-                                              _loadCategorias();
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Categoría eliminada exitosamente',
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                          context,
+                                                          false,
+                                                        ),
+                                                    child: const Text(
+                                                      'Cancelar',
+                                                    ),
                                                   ),
-                                                ),
-                                              );
-                                            } else {
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                const SnackBar(
-                                                  content: Text(
-                                                    'Error al eliminar categoría',
+                                                  TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(
+                                                          context,
+                                                          true,
+                                                        ),
+                                                    child: const Text(
+                                                      'Eliminar',
+                                                    ),
                                                   ),
-                                                ),
-                                              );
+                                                ],
+                                              ),
+                                            );
+                                            if (confirm == true) {
+                                              final exito =
+                                                  await CategoriaService()
+                                                      .eliminarCategoria(
+                                                        categoria.id!,
+                                                      );
+                                              if (exito) {
+                                                _loadCategorias();
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Categoría eliminada exitosamente',
+                                                    ),
+                                                  ),
+                                                );
+                                              } else {
+                                                ScaffoldMessenger.of(
+                                                  context,
+                                                ).showSnackBar(
+                                                  const SnackBar(
+                                                    content: Text(
+                                                      'Error al eliminar categoría',
+                                                    ),
+                                                  ),
+                                                );
+                                              }
                                             }
-                                          }
-                                        },
-                                      ),
-                                    ],
+                                          },
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 );
                               },
