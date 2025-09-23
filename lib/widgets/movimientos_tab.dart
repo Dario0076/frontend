@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:excel/excel.dart';
-// import 'dart:typed_data';
-// import 'dart:io';
-// import 'package:path_provider/path_provider.dart';
-import 'dart:html' as html;
 import '../services/movimientos_api_service.dart';
 import '../services/productos_api_service.dart';
 import '../services/usuario_service.dart';
+import '../utils/export_excel.dart';
 
 class MovimientosTab extends StatefulWidget {
   const MovimientosTab({super.key});
@@ -225,47 +221,20 @@ class _MovimientosTabState extends State<MovimientosTab> {
   }
 
   Future<void> _exportarMovimientosExcel() async {
-    final excel = Excel.createExcel();
-    final sheet = excel['Movimientos'];
-    sheet.appendRow([
-      'Tipo',
-      'Producto',
-      'Cantidad',
-      'Descripción',
-      'Usuario',
-      'Fecha',
-    ]);
-    for (final m in movimientos) {
-      sheet.appendRow([
-        m.tipoMovimiento,
-        _getProductoNombre(m.productoId),
-        m.cantidad,
-        m.descripcion,
-        (m.usuarioNombre ?? '') + ' ' + (m.usuarioEmail ?? ''),
-        m.fecha.toString().split('.')[0],
-      ]);
-    }
-    final bytes = excel.encode();
-    if (bytes != null) {
-      // Solo exportación web
-      final blob = html.Blob([bytes]);
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      html.AnchorElement(href: url)
-        ..setAttribute('download', 'movimientos.xlsx')
-        ..click();
-      html.Url.revokeObjectUrl(url);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Exportación exitosa: archivo Excel descargado.'),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Error: No se pudo generar el archivo Excel.'),
-        ),
-      );
-    }
+    final rows = [
+      ['Tipo', 'Producto', 'Cantidad', 'Descripción', 'Usuario', 'Fecha'],
+      ...movimientos.map(
+        (m) => [
+          m.tipoMovimiento,
+          _getProductoNombre(m.productoId),
+          m.cantidad,
+          m.descripcion,
+          (m.usuarioNombre ?? '') + ' ' + (m.usuarioEmail ?? ''),
+          m.fecha.toString().split('.')[0],
+        ],
+      ),
+    ];
+    await exportarStockExcel(rows, context);
   }
 
   @override

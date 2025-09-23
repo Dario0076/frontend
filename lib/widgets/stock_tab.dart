@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
-import 'package:excel/excel.dart' as ex;
-import 'dart:html' as html;
-import 'dart:io' as io;
-import 'package:path_provider/path_provider.dart' as path_provider;
 import '../models/stock_model.dart';
 import '../services/stock_api_service.dart';
 import '../services/productos_api_service.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import '../utils/export_excel.dart';
 
 class StockTab extends StatefulWidget {
   const StockTab({Key? key}) : super(key: key);
@@ -62,25 +58,23 @@ class _StockTabState extends State<StockTab> {
     try {
       final loadedStocks = await StockApiService.getStocks();
 
-      // Obtener nombres de productos para cada stock
+      // Obtener nombres de productos para cada stock en paralelo
+      final productos = await Future.wait(
+        loadedStocks.map(
+          (stock) => ProductosApiService.getProductoById(stock.productoId),
+        ),
+      );
+
       for (int i = 0; i < loadedStocks.length; i++) {
-        try {
-          final producto = await ProductosApiService.getProductoById(
-            loadedStocks[i].productoId,
+        final producto = productos[i];
+        if (producto != null) {
+          loadedStocks[i] = Stock(
+            id: loadedStocks[i].id,
+            productoId: loadedStocks[i].productoId,
+            cantidadActual: loadedStocks[i].cantidadActual,
+            umbralMinimo: loadedStocks[i].umbralMinimo,
+            nombreProducto: producto.nombre,
           );
-          if (producto != null) {
-            // Crear nuevo Stock con el nombre del producto
-            loadedStocks[i] = Stock(
-              id: loadedStocks[i].id,
-              productoId: loadedStocks[i].productoId,
-              cantidadActual: loadedStocks[i].cantidadActual,
-              umbralMinimo: loadedStocks[i].umbralMinimo,
-              nombreProducto: producto.nombre,
-            );
-          }
-        } catch (e) {
-          print('Error al obtener producto ${loadedStocks[i].productoId}: $e');
-          // Mantener el stock sin nombre si hay error
         }
       }
 
@@ -367,57 +361,16 @@ class _StockTabState extends State<StockTab> {
   }
 
   Future<void> _exportarStockExcel() async {
-    final excel = ex.Excel.createExcel();
-    final sheet = excel['Stock'];
-    sheet.appendRow(['Producto', 'Cantidad']);
-    for (final s in stocksFiltrados) {
-      sheet.appendRow([
-        s.nombreProducto ?? 'Producto ${s.productoId}',
-        s.cantidadActual,
-      ]);
-    }
-    final bytes = excel.encode();
-    if (kIsWeb) {
-      // Web: descarga usando AnchorElement
-      final blob = html.Blob([bytes]);
-      final url = html.Url.createObjectUrlFromBlob(blob);
-      html.AnchorElement(href: url)
-        ..setAttribute('download', 'stock.xlsx')
-        ..click();
-      html.Url.revokeObjectUrl(url);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Exportación exitosa: archivo Excel descargado.'),
-        ),
-      );
-    } else {
-      // Móvil/escritorio: guardar en carpeta de documentos/descargas
-      try {
-        final directory = await path_provider
-            .getApplicationDocumentsDirectory();
-        final file = io.File('${directory.path}/stock.xlsx');
-        if (bytes != null) {
-          await file.writeAsBytes(bytes);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Exportación exitosa: archivo guardado en ${file.path}',
-              ),
-            ),
-          );
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error: No se pudo generar el archivo Excel.'),
-            ),
-          );
-        }
-      } catch (e) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al guardar archivo: $e')));
-      }
-    }
+    final rows = [
+      ['Producto', 'Cantidad'],
+      ...stocksFiltrados.map(
+        (s) => [
+          s.nombreProducto ?? 'Producto  24{s.productoId}',
+          s.cantidadActual,
+        ],
+      ),
+    ];
+    await exportarStockExcel(rows, context);
   }
 
   @override

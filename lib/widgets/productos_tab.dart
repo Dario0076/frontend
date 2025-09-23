@@ -160,65 +160,116 @@ class _ProductosTabState extends State<ProductosTab> {
               padding: const EdgeInsets.all(12.0),
               child: Column(
                 children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 3,
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: const InputDecoration(
-                            labelText: 'Buscar producto',
-                            hintText: 'Nombre o descripción...',
-                            prefixIcon: Icon(Icons.search),
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                          onChanged: (value) => _filtrarProductos(),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        flex: 2,
-                        child: DropdownButtonFormField<int>(
-                          value: _selectedCategoriaId,
-                          decoration: const InputDecoration(
-                            labelText: 'Categoría',
-                            border: OutlineInputBorder(),
-                            isDense: true,
-                          ),
-                          items: [
-                            const DropdownMenuItem<int>(
-                              value: null,
-                              child: Text('Todas'),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isSmall = constraints.maxWidth < 370;
+                      final filterRow = Row(
+                        children: [
+                          Flexible(
+                            flex: 3,
+                            child: TextField(
+                              controller: _searchController,
+                              decoration: InputDecoration(
+                                labelText: 'Buscar producto',
+                                hintText: 'Nombre o descripción...',
+                                prefixIcon: const Icon(Icons.search),
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
+                              ),
+                              style: TextStyle(fontSize: isSmall ? 13 : 15),
+                              onChanged: (value) => _filtrarProductos(),
                             ),
-                            ...categorias.map((categoria) {
-                              return DropdownMenuItem<int>(
-                                value: categoria.id,
-                                child: Text(categoria.nombre),
-                              );
-                            }).toList(),
-                          ],
-                          onChanged: (value) {
-                            setState(() {
-                              _selectedCategoriaId = value;
-                            });
-                            _filtrarProductos();
-                          },
+                          ),
+                          const SizedBox(width: 6),
+                          Flexible(
+                            flex: 2,
+                            child: DropdownButtonFormField<int>(
+                              value: _selectedCategoriaId,
+                              decoration: InputDecoration(
+                                labelText: 'Categoría',
+                                border: const OutlineInputBorder(),
+                                isDense: true,
+                                contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 8,
+                                ),
+                              ),
+                              items: [
+                                DropdownMenuItem<int>(
+                                  value: null,
+                                  child: Text(
+                                    'Todas',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: isSmall ? 13 : 15,
+                                    ),
+                                  ),
+                                ),
+                                ...categorias.map((categoria) {
+                                  return DropdownMenuItem<int>(
+                                    value: categoria.id,
+                                    child: Text(
+                                      categoria.nombre,
+                                      style: TextStyle(
+                                        fontSize: isSmall ? 13 : 15,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  );
+                                }).toList(),
+                              ],
+                              onChanged: (value) {
+                                setState(() {
+                                  _selectedCategoriaId = value;
+                                });
+                                _filtrarProductos();
+                              },
+                              style: TextStyle(
+                                fontSize: isSmall ? 13 : 15,
+                                color: Colors.black,
+                              ),
+                              dropdownColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      );
+                      final clearButton = Padding(
+                        padding: EdgeInsets.only(
+                          top: isSmall ? 8 : 0,
+                          left: isSmall ? 0 : 8,
                         ),
-                      ),
-                      const SizedBox(width: 8),
-                      IconButton(
-                        onPressed: () {
-                          setState(() {
-                            _searchController.clear();
-                            _selectedCategoriaId = null;
-                          });
-                          _filtrarProductos();
-                        },
-                        icon: const Icon(Icons.clear),
-                        tooltip: 'Limpiar filtros',
-                      ),
-                    ],
+                        child: SizedBox(
+                          height: 36,
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                                _selectedCategoriaId = null;
+                              });
+                              _filtrarProductos();
+                            },
+                            child: const Text('Limpiar filtros'),
+                          ),
+                        ),
+                      );
+                      if (isSmall) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [filterRow, clearButton],
+                        );
+                      } else {
+                        return Row(
+                          children: [
+                            Expanded(child: filterRow),
+                            clearButton,
+                          ],
+                        );
+                      }
+                    },
                   ),
                   const SizedBox(height: 8),
                   Row(
