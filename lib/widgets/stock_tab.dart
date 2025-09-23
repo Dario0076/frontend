@@ -345,13 +345,12 @@ class _StockTabState extends State<StockTab> {
               ),
               pw.SizedBox(height: 16),
               pw.Table.fromTextArray(
-                headers: ['Producto', 'Cantidad', 'Umbral Mínimo'],
+                headers: ['Producto', 'Cantidad'],
                 data: stocksFiltrados
                     .map(
                       (s) => [
                         s.nombreProducto ?? 'Producto ${s.productoId}',
                         s.cantidadActual.toString(),
-                        s.umbralMinimo.toString(),
                       ],
                     )
                     .toList(),
@@ -370,12 +369,11 @@ class _StockTabState extends State<StockTab> {
   Future<void> _exportarStockExcel() async {
     final excel = ex.Excel.createExcel();
     final sheet = excel['Stock'];
-    sheet.appendRow(['Producto', 'Cantidad', 'Umbral Mínimo']);
+    sheet.appendRow(['Producto', 'Cantidad']);
     for (final s in stocksFiltrados) {
       sheet.appendRow([
         s.nombreProducto ?? 'Producto ${s.productoId}',
         s.cantidadActual,
-        s.umbralMinimo,
       ]);
     }
     final bytes = excel.encode();
