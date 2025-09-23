@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:excel/excel.dart' as ex;
+import 'dart:html' as html;
+import 'dart:io' as io;
+import 'package:path_provider/path_provider.dart' as path_provider;
 import '../models/stock_model.dart';
 import '../services/stock_api_service.dart';
 import '../services/productos_api_service.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 class StockTab extends StatefulWidget {
   const StockTab({Key? key}) : super(key: key);
@@ -15,10 +22,6 @@ class _StockTabState extends State<StockTab> {
   List<Stock> stocksFiltrados = [];
   bool isLoading = false;
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _productoIdController = TextEditingController();
-  final TextEditingController _cantidadController = TextEditingController();
-  final TextEditingController _umbralController = TextEditingController();
-  bool _expansionFormOpen = false;
 
   @override
   void initState() {
@@ -325,6 +328,100 @@ class _StockTabState extends State<StockTab> {
     }
   }
 
+  Future<void> _exportarStockPDF() async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Reporte de Stock',
+                style: pw.TextStyle(
+                  fontSize: 22,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 16),
+              pw.Table.fromTextArray(
+                headers: ['Producto', 'Cantidad', 'Umbral Mínimo'],
+                data: stocksFiltrados
+                    .map(
+                      (s) => [
+                        s.nombreProducto ?? 'Producto ${s.productoId}',
+                        s.cantidadActual.toString(),
+                        s.umbralMinimo.toString(),
+                      ],
+                    )
+                    .toList(),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+    await Printing.layoutPdf(onLayout: (format) async => pdf.save());
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Exportación exitosa: PDF generado.')),
+    );
+  }
+
+  Future<void> _exportarStockExcel() async {
+    final excel = ex.Excel.createExcel();
+    final sheet = excel['Stock'];
+    sheet.appendRow(['Producto', 'Cantidad', 'Umbral Mínimo']);
+    for (final s in stocksFiltrados) {
+      sheet.appendRow([
+        s.nombreProducto ?? 'Producto ${s.productoId}',
+        s.cantidadActual,
+        s.umbralMinimo,
+      ]);
+    }
+    final bytes = excel.encode();
+    if (kIsWeb) {
+      // Web: descarga usando AnchorElement
+      final blob = html.Blob([bytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.AnchorElement(href: url)
+        ..setAttribute('download', 'stock.xlsx')
+        ..click();
+      html.Url.revokeObjectUrl(url);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Exportación exitosa: archivo Excel descargado.'),
+        ),
+      );
+    } else {
+      // Móvil/escritorio: guardar en carpeta de documentos/descargas
+      try {
+        final directory = await path_provider
+            .getApplicationDocumentsDirectory();
+        final file = io.File('${directory.path}/stock.xlsx');
+        if (bytes != null) {
+          await file.writeAsBytes(bytes);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Exportación exitosa: archivo guardado en ${file.path}',
+              ),
+            ),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Error: No se pudo generar el archivo Excel.'),
+            ),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al guardar archivo: $e')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -356,6 +453,23 @@ class _StockTabState extends State<StockTab> {
                 icon: const Icon(Icons.refresh),
                 label: const Text('Actualizar'),
                 onPressed: _loadStocks,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Botones de exportación en la UI
+          Row(
+            children: [
+              ElevatedButton.icon(
+                icon: Icon(Icons.picture_as_pdf),
+                label: Text('Exportar PDF'),
+                onPressed: stocksFiltrados.isEmpty ? null : _exportarStockPDF,
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                icon: Icon(Icons.table_chart),
+                label: Text('Exportar Excel'),
+                onPressed: stocksFiltrados.isEmpty ? null : _exportarStockExcel,
               ),
             ],
           ),

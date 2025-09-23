@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'package:excel/excel.dart';
+// import 'dart:typed_data';
+// import 'dart:io';
+// import 'package:path_provider/path_provider.dart';
+import 'dart:html' as html;
 import '../services/movimientos_api_service.dart';
 import '../services/productos_api_service.dart';
 import '../services/usuario_service.dart';
@@ -169,6 +176,96 @@ class _MovimientosTabState extends State<MovimientosTab> {
       ),
     );
     return producto.nombre;
+  }
+
+  Future<void> _exportarMovimientosPDF() async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Text(
+                'Reporte de Movimientos',
+                style: pw.TextStyle(
+                  fontSize: 22,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 16),
+              pw.Table.fromTextArray(
+                headers: [
+                  'Tipo',
+                  'Producto',
+                  'Cantidad',
+                  'Descripción',
+                  'Usuario',
+                  'Fecha',
+                ],
+                data: movimientos
+                    .map(
+                      (m) => [
+                        m.tipoMovimiento,
+                        _getProductoNombre(m.productoId),
+                        m.cantidad.toString(),
+                        m.descripcion,
+                        (m.usuarioNombre ?? '') + ' ' + (m.usuarioEmail ?? ''),
+                        m.fecha.toString().split('.')[0],
+                      ],
+                    )
+                    .toList(),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+    await Printing.layoutPdf(onLayout: (format) async => pdf.save());
+  }
+
+  Future<void> _exportarMovimientosExcel() async {
+    final excel = Excel.createExcel();
+    final sheet = excel['Movimientos'];
+    sheet.appendRow([
+      'Tipo',
+      'Producto',
+      'Cantidad',
+      'Descripción',
+      'Usuario',
+      'Fecha',
+    ]);
+    for (final m in movimientos) {
+      sheet.appendRow([
+        m.tipoMovimiento,
+        _getProductoNombre(m.productoId),
+        m.cantidad,
+        m.descripcion,
+        (m.usuarioNombre ?? '') + ' ' + (m.usuarioEmail ?? ''),
+        m.fecha.toString().split('.')[0],
+      ]);
+    }
+    final bytes = excel.encode();
+    if (bytes != null) {
+      // Solo exportación web
+      final blob = html.Blob([bytes]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      html.AnchorElement(href: url)
+        ..setAttribute('download', 'movimientos.xlsx')
+        ..click();
+      html.Url.revokeObjectUrl(url);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Exportación exitosa: archivo Excel descargado.'),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: No se pudo generar el archivo Excel.'),
+        ),
+      );
+    }
   }
 
   @override
@@ -395,6 +492,25 @@ class _MovimientosTabState extends State<MovimientosTab> {
                     ),
                   ],
                 ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          // Botones de exportación
+          Row(
+            children: [
+              ElevatedButton.icon(
+                icon: const Icon(Icons.picture_as_pdf),
+                label: const Text('Exportar PDF'),
+                onPressed: movimientos.isEmpty ? null : _exportarMovimientosPDF,
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.table_chart),
+                label: const Text('Exportar Excel'),
+                onPressed: movimientos.isEmpty
+                    ? null
+                    : _exportarMovimientosExcel,
               ),
             ],
           ),
