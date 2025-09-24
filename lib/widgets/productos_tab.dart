@@ -169,13 +169,13 @@ class _ProductosTabState extends State<ProductosTab> {
                             flex: 3,
                             child: TextField(
                               controller: _searchController,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Buscar producto',
                                 hintText: 'Nombre o descripción...',
-                                prefixIcon: const Icon(Icons.search),
-                                border: const OutlineInputBorder(),
+                                prefixIcon: Icon(Icons.search),
+                                border: OutlineInputBorder(),
                                 isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(
+                                contentPadding: EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 8,
                                 ),
@@ -189,11 +189,11 @@ class _ProductosTabState extends State<ProductosTab> {
                             flex: 2,
                             child: DropdownButtonFormField<int>(
                               value: _selectedCategoriaId,
-                              decoration: InputDecoration(
+                              decoration: const InputDecoration(
                                 labelText: 'Categoría',
-                                border: const OutlineInputBorder(),
+                                border: OutlineInputBorder(),
                                 isDense: true,
-                                contentPadding: const EdgeInsets.symmetric(
+                                contentPadding: EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 8,
                                 ),

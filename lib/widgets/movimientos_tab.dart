@@ -206,7 +206,7 @@ class _MovimientosTabState extends State<MovimientosTab> {
                         _getProductoNombre(m.productoId),
                         m.cantidad.toString(),
                         m.descripcion,
-                        (m.usuarioNombre ?? '') + ' ' + (m.usuarioEmail ?? ''),
+                        '${m.usuarioNombre ?? ''} ${m.usuarioEmail ?? ''}',
                         m.fecha.toString().split('.')[0],
                       ],
                     )
@@ -229,7 +229,7 @@ class _MovimientosTabState extends State<MovimientosTab> {
           _getProductoNombre(m.productoId),
           m.cantidad,
           m.descripcion,
-          (m.usuarioNombre ?? '') + ' ' + (m.usuarioEmail ?? ''),
+          '${m.usuarioNombre ?? ''} ${m.usuarioEmail ?? ''}',
           m.fecha.toString().split('.')[0],
         ],
       ),

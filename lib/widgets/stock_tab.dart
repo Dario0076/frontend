@@ -412,14 +412,14 @@ class _StockTabState extends State<StockTab> {
           Row(
             children: [
               ElevatedButton.icon(
-                icon: Icon(Icons.picture_as_pdf),
-                label: Text('Exportar PDF'),
+                icon: const Icon(Icons.picture_as_pdf),
+                label: const Text('Exportar PDF'),
                 onPressed: stocksFiltrados.isEmpty ? null : _exportarStockPDF,
               ),
               const SizedBox(width: 8),
               ElevatedButton.icon(
-                icon: Icon(Icons.table_chart),
-                label: Text('Exportar Excel'),
+                icon: const Icon(Icons.table_chart),
+                label: const Text('Exportar Excel'),
                 onPressed: stocksFiltrados.isEmpty ? null : _exportarStockExcel,
               ),
             ],
