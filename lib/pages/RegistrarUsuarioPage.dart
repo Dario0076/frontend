@@ -14,6 +14,7 @@ class _RegistrarUsuarioPageState extends State<RegistrarUsuarioPage> {
   String nombre = '';
   String correo = '';
   String password = '';
+  bool _obscure = true;
 
   void registrarUsuario() async {
     if (_formKey.currentState!.validate()) {
@@ -50,8 +51,16 @@ class _RegistrarUsuarioPageState extends State<RegistrarUsuarioPage> {
                 validator: (v) => v!.isEmpty ? 'Ingrese correo' : null,
               ),
               TextFormField(
-                decoration: const InputDecoration(labelText: 'Contraseña'),
-                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: 'Contraseña',
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscure ? Icons.visibility : Icons.visibility_off,
+                    ),
+                    onPressed: () => setState(() => _obscure = !_obscure),
+                  ),
+                ),
+                obscureText: _obscure,
                 onChanged: (v) => password = v,
                 validator: (v) => v!.isEmpty ? 'Ingrese contraseña' : null,
               ),

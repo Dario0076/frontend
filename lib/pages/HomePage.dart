@@ -5,6 +5,7 @@ import '../widgets/productos_tab.dart';
 import '../widgets/usuarios_tab.dart';
 import '../widgets/movimientos_tab.dart';
 import '../widgets/categorias_tab.dart';
+import '../services/usuario_service.dart';
 
 /// Pantalla principal del sistema de inventario.
 /// Muestra las pestañas para navegar entre los módulos principales.
@@ -16,6 +17,21 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String rolActual = 'USER';
+
+  @override
+  void initState() {
+    super.initState();
+    obtenerRol();
+  }
+
+  Future<void> obtenerRol() async {
+    final usuario = await UsuarioService().getUsuarioLogueado();
+    setState(() {
+      rolActual = usuario['rol'] ?? 'USER';
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // Recupera el nombre del usuario si fue enviado por argumentos
@@ -66,13 +82,13 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           // Cada pestaña muestra el widget correspondiente al módulo
-          child: const TabBarView(
+          child: TabBarView(
             children: [
-              MovimientosTab(),
-              ProductosTab(),
-              UsuariosTab(),
-              CategoriasTab(),
-              StockTab(),
+              const MovimientosTab(),
+              const ProductosTab(),
+              UsuariosTab(rolActual: rolActual),
+              const CategoriasTab(),
+              const StockTab(),
             ],
           ),
         ),

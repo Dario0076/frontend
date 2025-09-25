@@ -19,6 +19,8 @@ dependencies:
   excel: ^2.0.7
   path_provider: ^2.1.5
 
+  bcrypt: ^1.1.3
+
 dev_dependencies:
 
   flutter_test:

@@ -18,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   String contrasena = '';
   bool cargando = false;
   String? error;
+  bool _obscure = true;
 
   /// Lógica para iniciar sesión.
   /// Llama a UsuarioService.login, guarda el JWT y navega a la pantalla principal si es exitoso.
@@ -139,8 +140,17 @@ class _LoginPageState extends State<LoginPage> {
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscure
+                                  ? Icons.visibility
+                                  : Icons.visibility_off,
+                            ),
+                            onPressed: () =>
+                                setState(() => _obscure = !_obscure),
+                          ),
                         ),
-                        obscureText: true,
+                        obscureText: _obscure,
                         onChanged: (v) => contrasena = v,
                         validator: (v) {
                           if (v == null || v.isEmpty) {

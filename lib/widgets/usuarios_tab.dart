@@ -1,234 +1,362 @@
 import 'package:flutter/material.dart';
-import '../services/usuarios_api_service.dart';
+import 'package:frontend/services/usuarios_api_service.dart';
 
 class UsuariosTab extends StatefulWidget {
-  const UsuariosTab({super.key});
+  final String rolActual;
+  const UsuariosTab({Key? key, required this.rolActual}) : super(key: key);
 
   @override
-  _UsuariosTabState createState() => _UsuariosTabState();
+  State<UsuariosTab> createState() => _UsuariosTabState();
 }
 
 class _UsuariosTabState extends State<UsuariosTab> {
   List<Usuario> usuarios = [];
+  List<Usuario> papelera = [];
   bool isLoading = true;
-  final TextEditingController _correoController = TextEditingController();
-  final TextEditingController _nombreController = TextEditingController();
-  final TextEditingController _contrasenaController = TextEditingController();
-  String _selectedRol = 'USER';
+  // Estado para paneles contraíbles
+  bool _activosExpanded = true;
+  bool _papeleraExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    _loadUsuarios();
+    cargarUsuarios();
   }
 
-  Future<void> _loadUsuarios() async {
+  Future<void> cargarUsuarios() async {
+    setState(() => isLoading = true);
+    final todos = await UsuariosApiService.getUsuarios();
     setState(() {
-      isLoading = true;
+      usuarios = todos.where((u) => u.activo).toList();
+      papelera = todos.where((u) => !u.activo).toList();
+      isLoading = false;
     });
-
-    try {
-      final usuariosData = await UsuariosApiService.getUsuarios();
-      setState(() {
-        usuarios = usuariosData;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Error al cargar usuarios: $e')));
-    }
   }
 
-  Future<void> _createUsuario() async {
-    if (_correoController.text.isEmpty ||
-        _nombreController.text.isEmpty ||
-        _contrasenaController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor completa todos los campos')),
-      );
-      return;
-    }
-
-    final usuario = Usuario(
-      correo: _correoController.text,
-      nombreUsuario: _nombreController.text,
-      contrasena: _contrasenaController.text,
-      rol: _selectedRol,
-    );
-
-    // Crear usuario usando autenticación JWT
-    final createdUsuario = await UsuariosApiService.createUsuario(usuario);
-
-    if (createdUsuario != null) {
-      _correoController.clear();
-      _nombreController.clear();
-      _contrasenaController.clear();
-      _selectedRol = 'USER';
-      _loadUsuarios();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Usuario creado exitosamente')),
-      );
-    } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Error al crear usuario')));
-    }
-  }
-
-  Future<void> _deleteUsuario(int id) async {
-    final success = await UsuariosApiService.deleteUsuario(id);
-
-    if (success) {
-      _loadUsuarios();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Usuario eliminado exitosamente')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Error al eliminar usuario')),
-      );
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          // Formulario de creación
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _correoController,
-                          decoration: const InputDecoration(
-                            labelText: 'Correo Electrónico',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: TextField(
-                          controller: _nombreController,
-                          decoration: const InputDecoration(
-                            labelText: 'Nombre de Usuario',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          controller: _contrasenaController,
-                          decoration: const InputDecoration(
-                            labelText: 'Contraseña',
-                            border: OutlineInputBorder(),
-                          ),
-                          obscureText: true,
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: DropdownButtonFormField<String>(
-                          value: _selectedRol,
-                          decoration: const InputDecoration(
-                            labelText: 'Rol',
-                            border: OutlineInputBorder(),
-                          ),
-                          items: ['USER', 'ADMIN'].map((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              _selectedRol = newValue!;
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        onPressed: _createUsuario,
-                        child: const Text('Crear Usuario'),
-                      ),
-                      ElevatedButton(
-                        onPressed: _loadUsuarios,
-                        child: const Text('Obtener Usuarios'),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
+  void mostrarDialogoPassword(Usuario usuario) {
+    final controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Editar contraseña'),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          decoration: const InputDecoration(labelText: 'Nueva contraseña'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
           ),
-          const SizedBox(height: 16),
-          // Lista de usuarios
-          Expanded(
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : usuarios.isEmpty
-                ? const Center(child: Text('No hay usuarios disponibles'))
-                : ListView.builder(
-                    itemCount: usuarios.length,
-                    itemBuilder: (context, index) {
-                      final usuario = usuarios[index];
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        child: ListTile(
-                          title: Text(usuario.nombreUsuario),
-                          subtitle: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text('Correo: ${usuario.correo}'),
-                              Text('Rol: ${usuario.rol}'),
-                              Text(
-                                'Estado: ${usuario.activo ? "Activo" : "Inactivo"}',
-                              ),
-                            ],
-                          ),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => usuario.id != null
-                                ? _deleteUsuario(usuario.id!)
-                                : null,
-                          ),
-                        ),
-                      );
-                    },
+          ElevatedButton(
+            onPressed: () async {
+              final nueva = controller.text.trim();
+              if (nueva.isNotEmpty && usuario.id != null) {
+                final exito =
+                    await UsuariosApiService.actualizarPasswordUsuario(
+                      usuario.id!,
+                      nueva,
+                    );
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      exito
+                          ? 'Contraseña actualizada'
+                          : 'Error al actualizar contraseña',
+                    ),
                   ),
+                );
+              }
+            },
+            child: const Text('Guardar'),
           ),
         ],
       ),
     );
   }
 
+  void mostrarDialogoCrearUsuario() {
+    final nombreCtrl = TextEditingController();
+    final correoCtrl = TextEditingController();
+    final passCtrl = TextEditingController();
+    String rol = 'USER';
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('Crear usuario'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: nombreCtrl,
+              decoration: const InputDecoration(labelText: 'Nombre'),
+            ),
+            TextField(
+              controller: correoCtrl,
+              decoration: const InputDecoration(labelText: 'Correo'),
+            ),
+            TextField(
+              controller: passCtrl,
+              decoration: const InputDecoration(labelText: 'Contraseña'),
+              obscureText: true,
+            ),
+            DropdownButtonFormField<String>(
+              value: rol,
+              items: const [
+                DropdownMenuItem(value: 'USER', child: Text('Usuario')),
+                DropdownMenuItem(value: 'ADMIN', child: Text('Administrador')),
+              ],
+              onChanged: (v) => rol = v ?? 'USER',
+              decoration: const InputDecoration(labelText: 'Rol'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              final nombre = nombreCtrl.text.trim();
+              final correo = correoCtrl.text.trim();
+              final pass = passCtrl.text.trim();
+              if (nombre.isNotEmpty && correo.isNotEmpty && pass.isNotEmpty) {
+                final nuevoUsuario = Usuario(
+                  correo: correo,
+                  nombreUsuario: nombre,
+                  contrasena: pass,
+                  rol: rol,
+                  activo: true,
+                );
+                final creado = await UsuariosApiService.createUsuario(
+                  nuevoUsuario,
+                );
+                Navigator.pop(context);
+                if (creado != null) {
+                  cargarUsuarios();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Usuario creado')),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Error al crear usuario')),
+                  );
+                }
+              }
+            },
+            child: const Text('Crear'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void eliminarUsuario(Usuario usuario) async {
+    if (usuario.id != null) {
+      final exito = await UsuariosApiService.deleteUsuario(usuario.id!);
+      cargarUsuarios();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            exito
+                ? 'Usuario eliminado permanentemente'
+                : 'Error al eliminar usuario',
+          ),
+        ),
+      );
+    }
+  }
+
+  void desactivarUsuario(Usuario usuario) async {
+    if (usuario.id != null) {
+      final actualizado = await UsuariosApiService.updateUsuario(
+        Usuario(
+          id: usuario.id,
+          correo: usuario.correo,
+          nombreUsuario: usuario.nombreUsuario,
+          contrasena: usuario.contrasena,
+          rol: usuario.rol,
+          activo: false,
+        ),
+      );
+      cargarUsuarios();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            actualizado != null
+                ? 'Usuario desactivado'
+                : 'Error al desactivar usuario',
+          ),
+        ),
+      );
+    }
+  }
+
+  void reactivarUsuario(Usuario usuario) async {
+    if (usuario.id != null) {
+      final actualizado = await UsuariosApiService.updateUsuario(
+        Usuario(
+          id: usuario.id,
+          correo: usuario.correo,
+          nombreUsuario: usuario.nombreUsuario,
+          contrasena: usuario.contrasena,
+          rol: usuario.rol,
+          activo: true,
+        ),
+      );
+      cargarUsuarios();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            actualizado != null
+                ? 'Usuario reactivado'
+                : 'Error al reactivar usuario',
+          ),
+        ),
+      );
+    }
+  }
+
   @override
-  void dispose() {
-    _correoController.dispose();
-    _nombreController.dispose();
-    _contrasenaController.dispose();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      floatingActionButton: widget.rolActual == 'ADMIN'
+          ? FloatingActionButton(
+              onPressed: mostrarDialogoCrearUsuario,
+              tooltip: 'Crear usuario',
+              child: const Icon(Icons.add),
+            )
+          : null,
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  ExpansionPanelList(
+                    expansionCallback: (int index, bool isExpanded) {
+                      setState(() {
+                        if (index == 0) {
+                          _activosExpanded = !_activosExpanded;
+                          if (_activosExpanded) _papeleraExpanded = false;
+                        } else {
+                          _papeleraExpanded = !_papeleraExpanded;
+                          if (_papeleraExpanded) _activosExpanded = false;
+                        }
+                      });
+                    },
+                    children: [
+                      ExpansionPanel(
+                        headerBuilder: (context, isExpanded) => const ListTile(
+                          title: Text(
+                            'Usuarios Activos',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        isExpanded: _activosExpanded,
+                        canTapOnHeader: true,
+                        body: usuarios.isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Text('No hay usuarios activos'),
+                              )
+                            : Column(
+                                children: usuarios
+                                    .map(
+                                      (u) => Card(
+                                        child: ListTile(
+                                          title: Text(u.nombreUsuario),
+                                          subtitle: Text(
+                                            '${u.correo} (${u.rol})',
+                                          ),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              if (widget.rolActual == 'ADMIN')
+                                                IconButton(
+                                                  icon: const Icon(
+                                                    Icons.lock_reset,
+                                                  ),
+                                                  tooltip: 'Editar contraseña',
+                                                  onPressed: () =>
+                                                      mostrarDialogoPassword(u),
+                                                ),
+                                              if (widget.rolActual == 'ADMIN')
+                                                IconButton(
+                                                  icon: const Icon(
+                                                    Icons.delete,
+                                                  ),
+                                                  tooltip: 'Desactivar usuario',
+                                                  onPressed: () =>
+                                                      desactivarUsuario(u),
+                                                ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                      ),
+                      ExpansionPanel(
+                        headerBuilder: (context, isExpanded) => const ListTile(
+                          title: Text(
+                            'Papelera',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        isExpanded: _papeleraExpanded,
+                        canTapOnHeader: true,
+                        body: papelera.isEmpty
+                            ? const Padding(
+                                padding: EdgeInsets.all(16.0),
+                                child: Text('La papelera está vacía'),
+                              )
+                            : Column(
+                                children: papelera
+                                    .map(
+                                      (u) => Card(
+                                        color: Colors.grey[200],
+                                        child: ListTile(
+                                          title: Text(u.nombreUsuario),
+                                          subtitle: Text(
+                                            '${u.correo} (${u.rol})',
+                                          ),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              IconButton(
+                                                icon: const Icon(Icons.restore),
+                                                tooltip: 'Restaurar usuario',
+                                                onPressed: () =>
+                                                    reactivarUsuario(u),
+                                              ),
+                                              IconButton(
+                                                icon: const Icon(
+                                                  Icons.delete_forever,
+                                                ),
+                                                tooltip:
+                                                    'Eliminar permanentemente',
+                                                onPressed: () =>
+                                                    eliminarUsuario(u),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
+                              ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+    );
+    // (Eliminado: las variables ya existen como campos de la clase)
   }
 }

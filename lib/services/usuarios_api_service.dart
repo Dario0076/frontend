@@ -122,20 +122,49 @@ class UsuariosApiService {
 
   static Future<Usuario?> updateUsuario(Usuario usuario) async {
     try {
+      final headers = await getAuthHeaders();
       final response = await http.put(
         Uri.parse('$baseUrl/${usuario.id}'),
-        headers: {'Content-Type': 'application/json'},
+        headers: headers,
         body: json.encode(usuario.toJson()),
       );
 
       if (response.statusCode == 200) {
         return Usuario.fromJson(json.decode(response.body));
       } else {
-        throw Exception('Error al actualizar usuario: ${response.statusCode}');
+        String errorMsg = 'Error al actualizar usuario: ${response.statusCode}';
+        try {
+          final body = json.decode(response.body);
+          if (body is Map && body['message'] != null) {
+            errorMsg = body['message'];
+          } else if (body is String) {
+            errorMsg = body;
+          }
+        } catch (_) {}
+        throw Exception(errorMsg);
       }
     } catch (e) {
       print('Error en updateUsuario: $e');
-      return null;
+      rethrow;
+    }
+  }
+
+  /// Actualiza solo la contraseña de un usuario por su ID
+  static Future<bool> actualizarPasswordUsuario(
+    int id,
+    String nuevaPassword,
+  ) async {
+    try {
+      final headers = await getAuthHeaders();
+      final response = await http.patch(
+        Uri.parse('$baseUrl/$id/password'),
+        headers: headers,
+        body: json.encode({'contrasena': nuevaPassword}),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error en actualizarPasswordUsuario: $e');
+      return false;
     }
   }
 }
